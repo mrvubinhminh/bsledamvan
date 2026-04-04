@@ -4,8 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Tạo Lịch Làm Việc - PK Bình Minh</title>
-    <!-- Favicon BM -->
+    
+    <!-- Cấu hình Web App / PWA (Thêm vào màn hình chính) -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Lịch Bình Minh">
+    <link rel="apple-touch-icon" href="https://i.ibb.co/RTVKhSqC/1938fb385874.jpg">
+    
+    <!-- Favicon BM cho trình duyệt -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23e11d48%22/><text x=%2250%25%22 y=%2250%25%22 font-family=%22Arial, sans-serif%22 font-size=%2250%22 font-weight=%22bold%22 fill=%22white%22 dominant-baseline=%22central%22 text-anchor=%22middle%22>BM</text></svg>" type="image/svg+xml">
+    
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome -->
@@ -618,20 +627,39 @@
         // Chụp ảnh bằng html2canvas với chuẩn 2K
         async function getCanvas() {
             const card = document.getElementById('preview-card');
+            const wrapper = document.getElementById('preview-wrapper');
             
-            // Backup current inline styles
+            // Backup current inline styles & scroll position
             const oldTransform = card.style.transform;
-            card.style.transform = 'scale(1)'; // Force real size for accuracy
+            const oldWrapperHeight = wrapper.style.height;
+            const currentScrollY = window.scrollY;
+
+            // Đưa thanh cuộn về vị trí trên cùng (Quan trọng: fix lỗi cắt khung trên điện thoại)
+            window.scrollTo(0, 0);
+
+            // Bắt buộc khung về đúng kích thước chuẩn
+            card.style.transform = 'scale(1)'; 
+            wrapper.style.height = `${card.offsetHeight}px`;
             
             showLoading();
+            
+            // Chờ giao diện render lại hoàn thiện
+            await new Promise(r => setTimeout(r, 200));
 
             try {
-                // scale: 5 kết hợp chiều ngang 440px -> Xuất ảnh width ~2200px (Chuẩn 2K nét căng)
+                // Điều chỉnh hệ số nét theo thiết bị (Bảo vệ tràn RAM đối với đt yếu, nhưng vẫn đảm bảo 2K/HD)
+                const isMobile = window.innerWidth <= 768;
+                const captureScale = isMobile ? 3.5 : 5; 
+
                 const canvas = await html2canvas(card, {
-                    scale: 5, 
+                    scale: captureScale, 
                     useCORS: true,
                     backgroundColor: null, 
-                    logging: false
+                    logging: false,
+                    scrollX: 0,
+                    scrollY: 0,
+                    windowWidth: document.documentElement.offsetWidth,
+                    windowHeight: document.documentElement.offsetHeight
                 });
                 return canvas;
             } catch (error) {
@@ -639,8 +667,10 @@
                 alert("Đã xảy ra lỗi khi tạo ảnh. Vui lòng thử lại.");
                 return null;
             } finally {
-                // Restore transform
+                // Phục hồi lại trạng thái ban đầu của trang
                 card.style.transform = oldTransform;
+                wrapper.style.height = oldWrapperHeight;
+                window.scrollTo(0, currentScrollY);
                 hideLoading();
             }
         }
