@@ -39,11 +39,9 @@
     <style>
         /* Đảm bảo khung ảnh xuất ra luôn giữ tỷ lệ đẹp kể cả trên mobile */
         #preview-wrapper {
-            width: 100%;
-            max-width: 440px; /* Thu gọn một chút để chữ to và dễ nhìn hơn trên đt */
+            width: 440px; /* Đổi thành kích thước cố định để không co ảnh */
+            min-width: 440px;
             margin: 0 auto;
-            display: flex;
-            justify-content: center;
         }
         #preview-card {
             width: 440px; /* Cố định kích thước để ảnh xuất ra đồng nhất */
@@ -153,71 +151,73 @@
                         </button>
                     </div>
 
-                    <!-- Khung Xem Trước (Preview) -->
-                    <div class="w-full overflow-hidden no-scrollbar bg-gray-200 rounded-lg p-4 flex justify-center relative shadow-inner">
-                        <div id="preview-wrapper" class="overflow-hidden">
-                            <!-- element thực sự sẽ bị render thành ảnh -->
-                            <div id="preview-card" class="bg-white p-5 rounded-2xl shadow-2xl relative transition-all duration-500 overflow-hidden">
-                                
-                                <!-- Theme Decorators (Shapes/Lines) -->
-                                <div id="theme-decorator" class="absolute top-0 left-0 w-full h-2 z-30"></div>
+                    <!-- Khung Xem Trước (Preview) có thanh trượt ngang -->
+                    <div class="w-full overflow-x-auto no-scrollbar bg-gray-200 rounded-lg p-4 relative shadow-inner">
+                        <div class="w-fit mx-auto">
+                            <div id="preview-wrapper" class="overflow-hidden">
+                                <!-- element thực sự sẽ bị render thành ảnh -->
+                                <div id="preview-card" class="bg-white p-5 rounded-2xl shadow-2xl relative transition-all duration-500 overflow-hidden">
+                                    
+                                    <!-- Theme Decorators (Shapes/Lines) -->
+                                    <div id="theme-decorator" class="absolute top-0 left-0 w-full h-2 z-30"></div>
 
-                                <!-- Viền bên trong (Inner Border) -->
-                                <div id="theme-inner-border" class="absolute inset-1.5 z-20 pointer-events-none rounded-xl"></div>
+                                    <!-- Viền bên trong (Inner Border) -->
+                                    <div id="theme-inner-border" class="absolute inset-1.5 z-20 pointer-events-none rounded-xl"></div>
 
-                                <!-- Lớp Hoa Văn Nền (Pattern) -->
-                                <div id="theme-pattern" class="absolute inset-0 z-0 pointer-events-none transition-all duration-500"></div>
-                                
-                                <!-- Biểu tượng in chìm (Watermark) -->
-                                <div id="theme-watermark" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[180px] opacity-[0.04] pointer-events-none z-0 transition-all duration-500 flex justify-center items-center">
-                                    <i class="fa-solid fa-stethoscope"></i>
-                                </div>
-
-                                <div class="relative z-30 flex flex-col min-h-full">
-                                    <!-- Header Thông Báo (Ngang) -->
-                                    <div class="mb-4 pt-3 flex flex-row items-center gap-4 w-full px-1">
-                                        <div id="preview-icon" class="shrink-0">
-                                            <!-- Logo bên trái -->
-                                            <img id="clinic-logo" src="https://i.ibb.co/RTVKhSqC/1938fb385874.jpg" alt="Logo Phòng Khám" crossorigin="anonymous" class="w-[100px] h-[100px] rounded-[22px] bg-white p-1.5 object-contain border-2 shadow-[0_4px_15px_-3px_rgba(0,0,0,0.1)]">
-                                        </div>
-                                        <div class="flex-1 flex flex-col justify-center text-left">
-                                            <h2 class="text-[11px] font-bold tracking-[0.1em] uppercase mb-0.5 opacity-90 leading-tight" id="preview-clinic-name">Phòng Khám Sản Phụ Khoa</h2>
-                                            <h3 class="text-[26px] font-black uppercase tracking-widest drop-shadow-sm mb-2 leading-none" id="preview-clinic-brand">BÌNH MINH</h3>
-                                            
-                                            <h1 class="text-[28px] font-black uppercase tracking-widest mb-1 leading-none drop-shadow-md">Thông Báo</h1>
-                                            <p class="text-[13px] font-bold uppercase tracking-wider mb-0.5 leading-tight">Lịch Làm Việc Trong Tuần</p>
-                                            <p id="preview-date-range" class="text-[12px] font-medium opacity-90 italic"></p>
-                                        </div>
+                                    <!-- Lớp Hoa Văn Nền (Pattern) -->
+                                    <div id="theme-pattern" class="absolute inset-0 z-0 pointer-events-none transition-all duration-500"></div>
+                                    
+                                    <!-- Biểu tượng in chìm (Watermark) -->
+                                    <div id="theme-watermark" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[180px] opacity-[0.04] pointer-events-none z-0 transition-all duration-500 flex justify-center items-center">
+                                        <i class="fa-solid fa-stethoscope"></i>
                                     </div>
 
-                                    <!-- Lịch Render -->
-                                    <div class="backdrop-blur-md rounded-xl p-3 shadow-sm border flex-1" id="preview-schedule-box">
-                                        <div id="preview-schedule-list" class="space-y-0.5 font-medium text-[14px]">
-                                            <!-- Lịch được render bởi JS -->
-                                        </div>
-                                    </div>
-
-                                    <!-- Footer Thông Tin Bác Sĩ & QR Code -->
-                                    <div class="mt-4 pt-4 border-t border-dashed flex flex-row items-center justify-between gap-3">
-                                        
-                                        <div id="preview-doctor-box" class="flex-1 rounded-xl py-2 px-2 shadow-sm flex flex-col items-center border border-white/40">
-                                            <h3 class="text-[15px] font-black uppercase mb-1.5 leading-tight drop-shadow-sm text-center">BS. CKII LÊ ĐÀM VÂN<br><span class="text-[12px] font-bold opacity-90">Bệnh Viện Từ Dũ</span></h3>
-                                            <div id="preview-phone-box" class="inline-flex items-center justify-center gap-2 font-bold text-[15px] px-4 py-1.5 rounded-full shadow-md">
-                                                <i class="fa-solid fa-phone-volume animate-bounce"></i>
-                                                <span>0906 404 312</span>
+                                    <div class="relative z-30 flex flex-col min-h-full">
+                                        <!-- Header Thông Báo (Ngang) -->
+                                        <div class="mb-4 pt-3 flex flex-row items-center gap-4 w-full px-1">
+                                            <div id="preview-icon" class="shrink-0">
+                                                <!-- Logo bên trái -->
+                                                <img id="clinic-logo" src="https://i.ibb.co/RTVKhSqC/1938fb385874.jpg" alt="Logo Phòng Khám" crossorigin="anonymous" class="w-[100px] h-[100px] rounded-[22px] bg-white p-1.5 object-contain border-2 shadow-[0_4px_15px_-3px_rgba(0,0,0,0.1)]">
+                                            </div>
+                                            <div class="flex-1 flex flex-col justify-center text-left">
+                                                <h2 class="text-[11px] font-bold tracking-[0.1em] uppercase mb-0.5 opacity-90 leading-tight" id="preview-clinic-name">Phòng Khám Sản Phụ Khoa</h2>
+                                                <h3 class="text-[26px] font-black uppercase tracking-widest drop-shadow-sm mb-2 leading-none" id="preview-clinic-brand">BÌNH MINH</h3>
+                                                
+                                                <h1 class="text-[28px] font-black uppercase tracking-widest mb-1 leading-none drop-shadow-md">Thông Báo</h1>
+                                                <p class="text-[13px] font-bold uppercase tracking-wider mb-0.5 leading-tight">Lịch Làm Việc Trong Tuần</p>
+                                                <p id="preview-date-range" class="text-[12px] font-medium opacity-90 italic"></p>
                                             </div>
                                         </div>
 
-                                        <div class="flex flex-col items-center justify-center bg-white p-2 rounded-xl shadow-sm border border-gray-200 shrink-0">
-                                            <div id="qrcode" class="w-[64px] h-[64px]"></div>
-                                            <p class="text-[9px] font-bold mt-1 text-center text-gray-700 uppercase">Bản đồ</p>
+                                        <!-- Lịch Render -->
+                                        <div class="backdrop-blur-md rounded-xl p-3 shadow-sm border flex-1" id="preview-schedule-box">
+                                            <div id="preview-schedule-list" class="space-y-0.5 font-medium text-[14px]">
+                                                <!-- Lịch được render bởi JS -->
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    <!-- Lời chào chốt nằm trên đường viền -->
-                                    <div class="text-center mt-4 flex flex-col gap-1.5 pb-0.5">
-                                        <p class="text-[11px] italic font-medium opacity-85 drop-shadow-sm">Rất hân hạnh được phục vụ và chăm sóc sức khỏe cho bạn.</p>
-                                        <p class="text-[14px] font-bold uppercase tracking-wide drop-shadow-sm">Xin trân trọng thông báo đến Quý khách!</p>
+                                        <!-- Footer Thông Tin Bác Sĩ & QR Code -->
+                                        <div class="mt-4 pt-4 border-t border-dashed flex flex-row items-center justify-between gap-3">
+                                            
+                                            <div id="preview-doctor-box" class="flex-1 rounded-xl py-2 px-2 shadow-sm flex flex-col items-center border border-white/40">
+                                                <h3 class="text-[15px] font-black uppercase mb-1.5 leading-tight drop-shadow-sm text-center">BS. CKII LÊ ĐÀM VÂN<br><span class="text-[12px] font-bold opacity-90">Bệnh Viện Từ Dũ</span></h3>
+                                                <div id="preview-phone-box" class="inline-flex items-center justify-center gap-2 font-bold text-[15px] px-4 py-1.5 rounded-full shadow-md">
+                                                    <i class="fa-solid fa-phone-volume animate-bounce"></i>
+                                                    <span>0906 404 312</span>
+                                                </div>
+                                            </div>
+
+                                            <div class="flex flex-col items-center justify-center bg-white p-2 rounded-xl shadow-sm border border-gray-200 shrink-0">
+                                                <div id="qrcode" class="w-[64px] h-[64px]"></div>
+                                                <p class="text-[9px] font-bold mt-1 text-center text-gray-700 uppercase">Bản đồ</p>
+                                            </div>
+                                        </div>
+
+                                        <!-- Lời chào chốt nằm trên đường viền -->
+                                        <div class="text-center mt-4 flex flex-col gap-1.5 pb-0.5">
+                                            <p class="text-[11px] italic font-medium opacity-85 drop-shadow-sm">Rất hân hạnh được phục vụ và chăm sóc sức khỏe cho bạn.</p>
+                                            <p class="text-[14px] font-bold uppercase tracking-wide drop-shadow-sm">Xin trân trọng thông báo đến Quý khách!</p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -335,18 +335,11 @@
         function adjustScale() {
             const wrapper = document.getElementById('preview-wrapper');
             const card = document.getElementById('preview-card');
-            const containerWidth = wrapper.parentElement.clientWidth - 32; // padding
             
-            if (containerWidth < 440) {
-                const scale = containerWidth / 440;
-                card.style.transform = `scale(${scale})`;
-                wrapper.style.height = `${card.offsetHeight * scale}px`;
-                wrapper.style.width = `${containerWidth}px`;
-            } else {
-                card.style.transform = `scale(1)`;
-                wrapper.style.height = `${card.offsetHeight}px`;
-                wrapper.style.width = `440px`;
-            }
+            // Vô hiệu hóa co ảnh trên điện thoại để luôn giữ nguyên độ phân giải 100%
+            card.style.transform = `scale(1)`;
+            wrapper.style.height = `${card.offsetHeight}px`;
+            wrapper.style.width = `440px`;
         }
 
         // --- RENDER BẢNG ĐIỀU KHIỂN LỊCH (CHẾ ĐỘ ẨN/HIỆN ACCORDION) ---
@@ -664,14 +657,17 @@
         async function getCanvas() {
             const card = document.getElementById('preview-card');
             const wrapper = document.getElementById('preview-wrapper');
+            const scrollContainer = wrapper.parentElement.parentElement; // Element có chứa scroll-x
             
             // Backup current inline styles & scroll position
             const oldTransform = card.style.transform;
             const oldWrapperHeight = wrapper.style.height;
             const currentScrollY = window.scrollY;
+            const currentScrollX = scrollContainer.scrollLeft;
 
             // Đưa thanh cuộn về vị trí trên cùng (Quan trọng: fix lỗi cắt khung trên điện thoại)
             window.scrollTo(0, 0);
+            scrollContainer.scrollLeft = 0;
 
             // Bắt buộc khung về đúng kích thước chuẩn
             card.style.transform = 'scale(1)'; 
@@ -707,6 +703,7 @@
                 card.style.transform = oldTransform;
                 wrapper.style.height = oldWrapperHeight;
                 window.scrollTo(0, currentScrollY);
+                scrollContainer.scrollLeft = currentScrollX;
                 hideLoading();
             }
         }
