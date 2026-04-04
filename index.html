@@ -80,127 +80,145 @@
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
             
             <!-- CỘT TRÁI: ĐIỀU KHIỂN & NHẬP LIỆU -->
-            <div class="lg:col-span-5 space-y-6">
+            <div class="lg:col-span-5 space-y-4">
                 
                 <!-- Bảng chọn thời gian -->
-                <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-gray-100">
-                    <h2 class="text-lg font-bold mb-4 border-b pb-2 flex items-center gap-2">
-                        <i class="fa-regular fa-calendar text-green-500"></i> Thời gian áp dụng
-                    </h2>
-                    <div class="flex flex-col sm:flex-row items-center gap-3 sm:gap-4">
-                        <div class="w-full sm:flex-1">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Từ ngày</label>
-                            <input type="date" id="date-from" onchange="updateDateRange()" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-blue-500 focus:border-blue-500 outline-none shadow-sm bg-white h-[44px]">
-                        </div>
-                        <div class="w-full sm:flex-1">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Đến ngày</label>
-                            <input type="date" id="date-to" onchange="updateDateRange()" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-blue-500 focus:border-blue-500 outline-none shadow-sm bg-white h-[44px]">
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                    <button onclick="toggleSection('time-section')" class="w-full p-4 sm:p-5 text-left flex items-center justify-between focus:outline-none hover:bg-gray-50 transition-colors">
+                        <h2 class="text-lg font-bold flex items-center gap-2">
+                            <i class="fa-regular fa-calendar text-green-500"></i> Thời gian áp dụng
+                        </h2>
+                        <i id="time-section-icon" class="fa-solid fa-chevron-up text-gray-400"></i>
+                    </button>
+                    <div id="time-section" class="px-4 sm:px-5 pb-4 sm:pb-5 block border-t border-gray-100 pt-3">
+                        <div class="flex flex-col sm:flex-row items-center gap-3 sm:gap-4">
+                            <div class="w-full sm:flex-1">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Từ ngày</label>
+                                <input type="date" id="date-from" onchange="updateDateRange()" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-blue-500 focus:border-blue-500 outline-none shadow-sm bg-white h-[44px]">
+                            </div>
+                            <div class="w-full sm:flex-1">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Đến ngày</label>
+                                <input type="date" id="date-to" onchange="updateDateRange()" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-blue-500 focus:border-blue-500 outline-none shadow-sm bg-white h-[44px]">
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Bảng chọn lịch -->
-                <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-gray-100">
-                    <h2 class="text-lg font-bold mb-4 border-b pb-2 flex items-center gap-2">
-                        <i class="fa-regular fa-calendar-check text-blue-500"></i> Cài đặt lịch tuần này
-                    </h2>
-                    <p class="text-[11px] text-gray-500 mb-3 italic">* Nhấp vào biểu tượng bên cạnh ngày để đổi Icon</p>
-                    
-                    <div id="schedule-controls" class="space-y-3">
-                        <!-- JS sẽ render các tuỳ chọn vào đây -->
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                    <button onclick="toggleSection('schedule-section')" class="w-full p-4 sm:p-5 text-left flex items-center justify-between focus:outline-none hover:bg-gray-50 transition-colors">
+                        <h2 class="text-lg font-bold flex items-center gap-2">
+                            <i class="fa-regular fa-calendar-check text-blue-500"></i> Cài đặt lịch tuần này
+                        </h2>
+                        <i id="schedule-section-icon" class="fa-solid fa-chevron-down text-gray-400"></i>
+                    </button>
+                    <div id="schedule-section" class="px-4 sm:px-5 pb-4 sm:pb-5 hidden border-t border-gray-100 pt-3">
+                        <p class="text-[11px] text-gray-500 mb-3 italic">* Nhấp vào biểu tượng bên cạnh ngày để đổi Icon</p>
+                        
+                        <div id="schedule-controls" class="space-y-3">
+                            <!-- JS sẽ render các tuỳ chọn vào đây -->
+                        </div>
                     </div>
                 </div>
 
                 <!-- Bảng chọn giao diện -->
-                <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-gray-100">
-                    <h2 class="text-lg font-bold mb-4 border-b pb-2 flex items-center gap-2">
-                        <i class="fa-solid fa-palette text-purple-500"></i> Chọn chủ đề (Theme)
-                    </h2>
-                    <div id="theme-controls" class="flex overflow-x-auto gap-3 pb-2 snap-x no-scrollbar items-start">
-                        <!-- JS sẽ render themes vào đây -->
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                    <button onclick="toggleSection('theme-section')" class="w-full p-4 sm:p-5 text-left flex items-center justify-between focus:outline-none hover:bg-gray-50 transition-colors">
+                        <h2 class="text-lg font-bold flex items-center gap-2">
+                            <i class="fa-solid fa-palette text-purple-500"></i> Chọn chủ đề (Theme)
+                        </h2>
+                        <i id="theme-section-icon" class="fa-solid fa-chevron-down text-gray-400"></i>
+                    </button>
+                    <div id="theme-section" class="px-4 sm:px-5 pb-4 sm:pb-5 hidden border-t border-gray-100 pt-3">
+                        <div id="theme-controls" class="flex overflow-x-auto gap-3 pb-2 snap-x no-scrollbar items-start">
+                            <!-- JS sẽ render themes vào đây -->
+                        </div>
                     </div>
                 </div>
 
             </div>
 
             <!-- CỘT PHẢI: XEM TRƯỚC VÀ XUẤT ẢNH -->
-            <div class="lg:col-span-7 flex flex-col items-center">
-                
-                <!-- Thanh công cụ hành động (Đã ghim dưới đáy màn hình trên mobile) -->
-                <div class="fixed bottom-0 left-0 w-full bg-white/95 backdrop-blur-md p-4 border-t border-gray-200 z-50 flex gap-3 justify-center shadow-[0_-10px_20px_-5px_rgba(0,0,0,0.1)] sm:static sm:bg-transparent sm:backdrop-blur-none sm:p-0 sm:border-t-0 sm:mb-4 sm:w-full sm:max-w-[440px] sm:shadow-none">
-                    <button onclick="saveImage()" class="flex-1 max-w-[220px] bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg transition duration-200 flex items-center justify-center gap-2 active:scale-95">
-                        <i class="fa-solid fa-download"></i> Lưu Ảnh HD 2K
-                    </button>
-                    <button onclick="shareImage()" class="flex-1 max-w-[220px] bg-green-600 hover:bg-green-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg transition duration-200 flex items-center justify-center gap-2 active:scale-95">
-                        <i class="fa-solid fa-share-nodes"></i> Chia Sẻ
-                    </button>
-                </div>
+            <div class="lg:col-span-7 relative">
+                <!-- Wrapper Sticky để ảnh luôn hiển thị 100% khi cuộn chuột trên máy tính -->
+                <div class="lg:sticky lg:top-[88px] flex flex-col items-center">
+                    
+                    <!-- Thanh công cụ hành động (Đã ghim dưới đáy màn hình trên mobile) -->
+                    <div class="fixed bottom-0 left-0 w-full bg-white/95 backdrop-blur-md p-4 border-t border-gray-200 z-50 flex gap-3 justify-center shadow-[0_-10px_20px_-5px_rgba(0,0,0,0.1)] sm:static sm:bg-transparent sm:backdrop-blur-none sm:p-0 sm:border-t-0 sm:mb-4 sm:w-full sm:max-w-[440px] sm:shadow-none">
+                        <button onclick="saveImage()" class="flex-1 max-w-[220px] bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg transition duration-200 flex items-center justify-center gap-2 active:scale-95">
+                            <i class="fa-solid fa-download"></i> Lưu Ảnh HD 2K
+                        </button>
+                        <button onclick="shareImage()" class="flex-1 max-w-[220px] bg-green-600 hover:bg-green-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg transition duration-200 flex items-center justify-center gap-2 active:scale-95">
+                            <i class="fa-solid fa-share-nodes"></i> Chia Sẻ
+                        </button>
+                    </div>
 
-                <!-- Khung Xem Trước (Preview) -->
-                <div class="w-full overflow-hidden no-scrollbar bg-gray-200 rounded-lg p-4 flex justify-center relative shadow-inner">
-                    <div id="preview-wrapper" class="overflow-hidden">
-                        <!-- element thực sự sẽ bị render thành ảnh -->
-                        <div id="preview-card" class="bg-white p-5 rounded-2xl shadow-2xl relative transition-all duration-500 overflow-hidden">
-                            
-                            <!-- Theme Decorators (Shapes/Lines) -->
-                            <div id="theme-decorator" class="absolute top-0 left-0 w-full h-2 z-30"></div>
+                    <!-- Khung Xem Trước (Preview) -->
+                    <div class="w-full overflow-hidden no-scrollbar bg-gray-200 rounded-lg p-4 flex justify-center relative shadow-inner">
+                        <div id="preview-wrapper" class="overflow-hidden">
+                            <!-- element thực sự sẽ bị render thành ảnh -->
+                            <div id="preview-card" class="bg-white p-5 rounded-2xl shadow-2xl relative transition-all duration-500 overflow-hidden">
+                                
+                                <!-- Theme Decorators (Shapes/Lines) -->
+                                <div id="theme-decorator" class="absolute top-0 left-0 w-full h-2 z-30"></div>
 
-                            <!-- Viền bên trong (Inner Border) -->
-                            <div id="theme-inner-border" class="absolute inset-1.5 z-20 pointer-events-none rounded-xl"></div>
+                                <!-- Viền bên trong (Inner Border) -->
+                                <div id="theme-inner-border" class="absolute inset-1.5 z-20 pointer-events-none rounded-xl"></div>
 
-                            <!-- Lớp Hoa Văn Nền (Pattern) -->
-                            <div id="theme-pattern" class="absolute inset-0 z-0 pointer-events-none transition-all duration-500"></div>
-                            
-                            <!-- Biểu tượng in chìm (Watermark) -->
-                            <div id="theme-watermark" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[180px] opacity-[0.04] pointer-events-none z-0 transition-all duration-500 flex justify-center items-center">
-                                <i class="fa-solid fa-stethoscope"></i>
-                            </div>
-
-                            <div class="relative z-30 flex flex-col min-h-full">
-                                <!-- Header Thông Báo (Ngang) -->
-                                <div class="mb-4 pt-3 flex flex-row items-center gap-4 w-full px-1">
-                                    <div id="preview-icon" class="shrink-0">
-                                        <!-- Logo bên trái -->
-                                        <img id="clinic-logo" src="https://i.ibb.co/RTVKhSqC/1938fb385874.jpg" alt="Logo Phòng Khám" crossorigin="anonymous" class="w-[100px] h-[100px] rounded-[22px] bg-white p-1.5 object-contain border-2 shadow-[0_4px_15px_-3px_rgba(0,0,0,0.1)]">
-                                    </div>
-                                    <div class="flex-1 flex flex-col justify-center text-left">
-                                        <h2 class="text-[11px] font-bold tracking-[0.1em] uppercase mb-0.5 opacity-90 leading-tight" id="preview-clinic-name">Phòng Khám Sản Phụ Khoa</h2>
-                                        <h3 class="text-[26px] font-black uppercase tracking-widest drop-shadow-sm mb-2 leading-none" id="preview-clinic-brand">BÌNH MINH</h3>
-                                        
-                                        <h1 class="text-[28px] font-black uppercase tracking-widest mb-1 leading-none drop-shadow-md">Thông Báo</h1>
-                                        <p class="text-[13px] font-bold uppercase tracking-wider mb-0.5 leading-tight">Lịch Làm Việc Trong Tuần</p>
-                                        <p id="preview-date-range" class="text-[12px] font-medium opacity-90 italic"></p>
-                                    </div>
+                                <!-- Lớp Hoa Văn Nền (Pattern) -->
+                                <div id="theme-pattern" class="absolute inset-0 z-0 pointer-events-none transition-all duration-500"></div>
+                                
+                                <!-- Biểu tượng in chìm (Watermark) -->
+                                <div id="theme-watermark" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[180px] opacity-[0.04] pointer-events-none z-0 transition-all duration-500 flex justify-center items-center">
+                                    <i class="fa-solid fa-stethoscope"></i>
                                 </div>
 
-                                <!-- Lịch Render -->
-                                <div class="backdrop-blur-md rounded-xl p-3 shadow-sm border flex-1" id="preview-schedule-box">
-                                    <div id="preview-schedule-list" class="space-y-0.5 font-medium text-[14px]">
-                                        <!-- Lịch được render bởi JS -->
-                                    </div>
-                                </div>
-
-                                <!-- Footer Thông Tin Bác Sĩ & QR Code -->
-                                <div class="mt-4 pt-4 border-t border-dashed flex flex-row items-center justify-between gap-3">
-                                    
-                                    <div id="preview-doctor-box" class="flex-1 rounded-xl py-2 px-2 shadow-sm flex flex-col items-center border border-white/40">
-                                        <h3 class="text-[15px] font-black uppercase mb-1.5 leading-tight drop-shadow-sm text-center">BS. CKII LÊ ĐÀM VÂN<br><span class="text-[12px] font-bold opacity-90">Bệnh Viện Từ Dũ</span></h3>
-                                        <div id="preview-phone-box" class="inline-flex items-center justify-center gap-2 font-bold text-[15px] px-4 py-1.5 rounded-full shadow-md">
-                                            <i class="fa-solid fa-phone-volume animate-bounce"></i>
-                                            <span>0906 404 312</span>
+                                <div class="relative z-30 flex flex-col min-h-full">
+                                    <!-- Header Thông Báo (Ngang) -->
+                                    <div class="mb-4 pt-3 flex flex-row items-center gap-4 w-full px-1">
+                                        <div id="preview-icon" class="shrink-0">
+                                            <!-- Logo bên trái -->
+                                            <img id="clinic-logo" src="https://i.ibb.co/RTVKhSqC/1938fb385874.jpg" alt="Logo Phòng Khám" crossorigin="anonymous" class="w-[100px] h-[100px] rounded-[22px] bg-white p-1.5 object-contain border-2 shadow-[0_4px_15px_-3px_rgba(0,0,0,0.1)]">
+                                        </div>
+                                        <div class="flex-1 flex flex-col justify-center text-left">
+                                            <h2 class="text-[11px] font-bold tracking-[0.1em] uppercase mb-0.5 opacity-90 leading-tight" id="preview-clinic-name">Phòng Khám Sản Phụ Khoa</h2>
+                                            <h3 class="text-[26px] font-black uppercase tracking-widest drop-shadow-sm mb-2 leading-none" id="preview-clinic-brand">BÌNH MINH</h3>
+                                            
+                                            <h1 class="text-[28px] font-black uppercase tracking-widest mb-1 leading-none drop-shadow-md">Thông Báo</h1>
+                                            <p class="text-[13px] font-bold uppercase tracking-wider mb-0.5 leading-tight">Lịch Làm Việc Trong Tuần</p>
+                                            <p id="preview-date-range" class="text-[12px] font-medium opacity-90 italic"></p>
                                         </div>
                                     </div>
 
-                                    <div class="flex flex-col items-center justify-center bg-white p-2 rounded-xl shadow-sm border border-gray-200 shrink-0">
-                                        <div id="qrcode" class="w-[64px] h-[64px]"></div>
-                                        <p class="text-[9px] font-bold mt-1 text-center text-gray-700 uppercase">Bản đồ</p>
+                                    <!-- Lịch Render -->
+                                    <div class="backdrop-blur-md rounded-xl p-3 shadow-sm border flex-1" id="preview-schedule-box">
+                                        <div id="preview-schedule-list" class="space-y-0.5 font-medium text-[14px]">
+                                            <!-- Lịch được render bởi JS -->
+                                        </div>
                                     </div>
-                                </div>
 
-                                <!-- Lời chào chốt nằm trên đường viền -->
-                                <div class="text-center mt-4 flex flex-col gap-1.5 pb-0.5">
-                                    <p class="text-[11px] italic font-medium opacity-85 drop-shadow-sm">Rất hân hạnh được phục vụ và chăm sóc sức khỏe cho bạn.</p>
-                                    <p class="text-[14px] font-bold uppercase tracking-wide drop-shadow-sm">Xin trân trọng thông báo đến Quý khách!</p>
+                                    <!-- Footer Thông Tin Bác Sĩ & QR Code -->
+                                    <div class="mt-4 pt-4 border-t border-dashed flex flex-row items-center justify-between gap-3">
+                                        
+                                        <div id="preview-doctor-box" class="flex-1 rounded-xl py-2 px-2 shadow-sm flex flex-col items-center border border-white/40">
+                                            <h3 class="text-[15px] font-black uppercase mb-1.5 leading-tight drop-shadow-sm text-center">BS. CKII LÊ ĐÀM VÂN<br><span class="text-[12px] font-bold opacity-90">Bệnh Viện Từ Dũ</span></h3>
+                                            <div id="preview-phone-box" class="inline-flex items-center justify-center gap-2 font-bold text-[15px] px-4 py-1.5 rounded-full shadow-md">
+                                                <i class="fa-solid fa-phone-volume animate-bounce"></i>
+                                                <span>0906 404 312</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="flex flex-col items-center justify-center bg-white p-2 rounded-xl shadow-sm border border-gray-200 shrink-0">
+                                            <div id="qrcode" class="w-[64px] h-[64px]"></div>
+                                            <p class="text-[9px] font-bold mt-1 text-center text-gray-700 uppercase">Bản đồ</p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Lời chào chốt nằm trên đường viền -->
+                                    <div class="text-center mt-4 flex flex-col gap-1.5 pb-0.5">
+                                        <p class="text-[11px] italic font-medium opacity-85 drop-shadow-sm">Rất hân hạnh được phục vụ và chăm sóc sức khỏe cho bạn.</p>
+                                        <p class="text-[14px] font-bold uppercase tracking-wide drop-shadow-sm">Xin trân trọng thông báo đến Quý khách!</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -293,6 +311,24 @@
             updatePreview();
             adjustScale(); // Điều chỉnh tỷ lệ khung nhìn
             window.addEventListener('resize', adjustScale);
+        }
+
+        // --- HÀM ẨN/HIỆN CÁC MỤC ĐIỀU KHIỂN ---
+        function toggleSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            const icon = document.getElementById(sectionId + '-icon');
+            
+            if (section.classList.contains('hidden')) {
+                section.classList.remove('hidden');
+                section.classList.add('block');
+                icon.classList.remove('fa-chevron-down');
+                icon.classList.add('fa-chevron-up');
+            } else {
+                section.classList.remove('block');
+                section.classList.add('hidden');
+                icon.classList.remove('fa-chevron-up');
+                icon.classList.add('fa-chevron-down');
+            }
         }
 
         // --- ĐIỀU CHỈNH TỶ LỆ XEM TRƯỚC DỰA TRÊN MÀN HÌNH ---
