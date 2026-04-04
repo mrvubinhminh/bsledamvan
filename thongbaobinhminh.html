@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tạo Lịch Làm Việc - PK Bình Minh</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- html2canvas for high-res image export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- QRCode.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        serif: ['Merriweather', 'serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Đảm bảo khung ảnh xuất ra luôn giữ tỷ lệ đẹp kể cả trên mobile */
+        #preview-wrapper {
+            width: 100%;
+            max-width: 440px; /* Thu gọn một chút để chữ to và dễ nhìn hơn trên đt */
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+        }
+        #preview-card {
+            width: 440px; /* Cố định kích thước để ảnh xuất ra đồng nhất */
+            transform-origin: top left;
+        }
+        /* Hide scrollbar for the wrapper */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen text-gray-800 font-sans">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="bg-rose-100 text-rose-600 p-2 rounded-full">
+                    <i class="fa-solid fa-stethoscope text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold text-gray-900 leading-tight">Phòng Khám Bình Minh</h1>
+                    <p class="text-xs text-gray-500">Công cụ tạo thông báo lịch làm việc</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 py-6 pb-28 sm:pb-8">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
+            
+            <!-- CỘT TRÁI: ĐIỀU KHIỂN & NHẬP LIỆU -->
+            <div class="lg:col-span-5 space-y-6">
+                
+                <!-- Bảng chọn thời gian -->
+                <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-gray-100">
+                    <h2 class="text-lg font-bold mb-4 border-b pb-2 flex items-center gap-2">
+                        <i class="fa-regular fa-calendar text-green-500"></i> Thời gian áp dụng
+                    </h2>
+                    <div class="flex flex-col sm:flex-row items-center gap-3 sm:gap-4">
+                        <div class="w-full sm:flex-1">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Từ ngày</label>
+                            <input type="date" id="date-from" onchange="updateDateRange()" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-blue-500 focus:border-blue-500 outline-none shadow-sm bg-white h-[44px]">
+                        </div>
+                        <div class="w-full sm:flex-1">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Đến ngày</label>
+                            <input type="date" id="date-to" onchange="updateDateRange()" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-blue-500 focus:border-blue-500 outline-none shadow-sm bg-white h-[44px]">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bảng chọn lịch -->
+                <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-gray-100">
+                    <h2 class="text-lg font-bold mb-4 border-b pb-2 flex items-center gap-2">
+                        <i class="fa-regular fa-calendar-check text-blue-500"></i> Cài đặt lịch tuần này
+                    </h2>
+                    <p class="text-[11px] text-gray-500 mb-3 italic">* Nhấp vào biểu tượng bên cạnh ngày để đổi Icon</p>
+                    
+                    <div id="schedule-controls" class="space-y-3">
+                        <!-- JS sẽ render các tuỳ chọn vào đây -->
+                    </div>
+                </div>
+
+                <!-- Bảng chọn giao diện -->
+                <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-gray-100">
+                    <h2 class="text-lg font-bold mb-4 border-b pb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-palette text-purple-500"></i> Chọn chủ đề (Theme)
+                    </h2>
+                    <div id="theme-controls" class="flex overflow-x-auto gap-3 pb-2 snap-x no-scrollbar items-start">
+                        <!-- JS sẽ render themes vào đây -->
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- CỘT PHẢI: XEM TRƯỚC VÀ XUẤT ẢNH -->
+            <div class="lg:col-span-7 flex flex-col items-center">
+                
+                <!-- Thanh công cụ hành động (Đã ghim dưới đáy màn hình trên mobile) -->
+                <div class="fixed bottom-0 left-0 w-full bg-white/95 backdrop-blur-md p-4 border-t border-gray-200 z-50 flex gap-3 justify-center shadow-[0_-10px_20px_-5px_rgba(0,0,0,0.1)] sm:static sm:bg-transparent sm:backdrop-blur-none sm:p-0 sm:border-t-0 sm:mb-4 sm:w-full sm:max-w-[440px] sm:shadow-none">
+                    <button onclick="saveImage()" class="flex-1 max-w-[220px] bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg transition duration-200 flex items-center justify-center gap-2 active:scale-95">
+                        <i class="fa-solid fa-download"></i> Lưu Ảnh HD 2K
+                    </button>
+                    <button onclick="shareImage()" class="flex-1 max-w-[220px] bg-green-600 hover:bg-green-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg transition duration-200 flex items-center justify-center gap-2 active:scale-95">
+                        <i class="fa-solid fa-share-nodes"></i> Chia Sẻ
+                    </button>
+                </div>
+
+                <!-- Khung Xem Trước (Preview) -->
+                <div class="w-full overflow-hidden no-scrollbar bg-gray-200 rounded-lg p-4 flex justify-center relative shadow-inner">
+                    <div id="preview-wrapper" class="overflow-hidden">
+                        <!-- element thực sự sẽ bị render thành ảnh -->
+                        <div id="preview-card" class="bg-white p-5 rounded-2xl shadow-2xl relative transition-all duration-500 overflow-hidden">
+                            
+                            <!-- Theme Decorators (Shapes/Lines) -->
+                            <div id="theme-decorator" class="absolute top-0 left-0 w-full h-2 z-30"></div>
+
+                            <!-- Viền bên trong (Inner Border) -->
+                            <div id="theme-inner-border" class="absolute inset-1.5 z-20 pointer-events-none rounded-xl"></div>
+
+                            <!-- Lớp Hoa Văn Nền (Pattern) -->
+                            <div id="theme-pattern" class="absolute inset-0 z-0 pointer-events-none transition-all duration-500"></div>
+                            
+                            <!-- Biểu tượng in chìm (Watermark) -->
+                            <div id="theme-watermark" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[180px] opacity-[0.04] pointer-events-none z-0 transition-all duration-500 flex justify-center items-center">
+                                <i class="fa-solid fa-stethoscope"></i>
+                            </div>
+
+                            <div class="relative z-30 flex flex-col min-h-full">
+                                <!-- Header Thông Báo (Ngang) -->
+                                <div class="mb-4 pt-3 flex flex-row items-center gap-4 w-full px-1">
+                                    <div id="preview-icon" class="shrink-0">
+                                        <!-- Logo bên trái -->
+                                        <img id="clinic-logo" src="https://i.ibb.co/RTVKhSqC/1938fb385874.jpg" alt="Logo Phòng Khám" crossorigin="anonymous" class="w-[100px] h-[100px] rounded-[22px] bg-white p-1.5 object-contain border-2 shadow-[0_4px_15px_-3px_rgba(0,0,0,0.1)]">
+                                    </div>
+                                    <div class="flex-1 flex flex-col justify-center text-left">
+                                        <h2 class="text-[11px] font-bold tracking-[0.1em] uppercase mb-0.5 opacity-90 leading-tight" id="preview-clinic-name">Phòng Khám Sản Phụ Khoa</h2>
+                                        <h3 class="text-[26px] font-black uppercase tracking-widest drop-shadow-sm mb-2 leading-none" id="preview-clinic-brand">BÌNH MINH</h3>
+                                        
+                                        <h1 class="text-[28px] font-black uppercase tracking-widest mb-1 leading-none drop-shadow-md">Thông Báo</h1>
+                                        <p class="text-[13px] font-bold uppercase tracking-wider mb-0.5 leading-tight">Lịch Làm Việc Trong Tuần</p>
+                                        <p id="preview-date-range" class="text-[12px] font-medium opacity-90 italic"></p>
+                                    </div>
+                                </div>
+
+                                <!-- Lịch Render -->
+                                <div class="backdrop-blur-md rounded-xl p-3 shadow-sm border flex-1" id="preview-schedule-box">
+                                    <div id="preview-schedule-list" class="space-y-0.5 font-medium text-[14px]">
+                                        <!-- Lịch được render bởi JS -->
+                                    </div>
+                                </div>
+
+                                <!-- Footer Thông Tin Bác Sĩ & QR Code -->
+                                <div class="mt-4 pt-4 border-t border-dashed flex flex-row items-center justify-between gap-3">
+                                    
+                                    <div id="preview-doctor-box" class="flex-1 rounded-xl py-2 px-2 shadow-sm flex flex-col items-center border border-white/40">
+                                        <h3 class="text-[15px] font-black uppercase mb-1.5 leading-tight drop-shadow-sm text-center">BS. CKII LÊ ĐÀM VÂN<br><span class="text-[12px] font-bold opacity-90">Bệnh Viện Từ Dũ</span></h3>
+                                        <div id="preview-phone-box" class="inline-flex items-center justify-center gap-2 font-bold text-[15px] px-4 py-1.5 rounded-full shadow-md">
+                                            <i class="fa-solid fa-phone-volume animate-bounce"></i>
+                                            <span>0906 404 312</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex flex-col items-center justify-center bg-white p-2 rounded-xl shadow-sm border border-gray-200 shrink-0">
+                                        <div id="qrcode" class="w-[64px] h-[64px]"></div>
+                                        <p class="text-[9px] font-bold mt-1 text-center text-gray-700 uppercase">Bản đồ</p>
+                                    </div>
+                                </div>
+
+                                <!-- Lời chào chốt nằm trên đường viền -->
+                                <div class="text-center mt-4 flex flex-col gap-1.5 pb-0.5">
+                                    <p class="text-[11px] italic font-medium opacity-85 drop-shadow-sm">Rất hân hạnh được phục vụ và chăm sóc sức khỏe cho bạn.</p>
+                                    <p class="text-[14px] font-bold uppercase tracking-wide drop-shadow-sm">Xin trân trọng thông báo đến Quý khách!</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal trạng thái (Loading...) -->
+    <div id="loading-modal" class="fixed inset-0 bg-black/60 z-[100] hidden items-center justify-center backdrop-blur-sm">
+        <div class="bg-white p-6 rounded-2xl shadow-xl text-center flex flex-col items-center">
+            <i class="fa-solid fa-spinner fa-spin text-4xl text-blue-600 mb-4"></i>
+            <h3 class="text-lg font-bold text-gray-800">Đang xuất ảnh 2K siêu nét...</h3>
+            <p class="text-sm text-gray-500">Vui lòng chờ giây lát</p>
+        </div>
+    </div>
+
+    <script>
+        // --- DANH SÁCH 10 ICON SINH ĐỘNG ---
+        const dayIcons = [
+            { icon: 'fa-sun', color: 'text-amber-500' },          // Nắng (1)
+            { icon: 'fa-star', color: 'text-yellow-400' },        // Sao (2)
+            { icon: 'fa-heart', color: 'text-rose-500' },         // Tim (3)
+            { icon: 'fa-leaf', color: 'text-green-500' },         // Lá (4)
+            { icon: 'fa-seedling', color: 'text-emerald-500' },   // Mầm non (5)
+            { icon: 'fa-clover', color: 'text-teal-500' },        // Cỏ 4 lá (6)
+            { icon: 'fa-calendar-check', color: 'text-blue-500' },// Lịch (7)
+            { icon: 'fa-clock', color: 'text-indigo-500' },       // Đồng hồ (8)
+            { icon: 'fa-bell', color: 'text-purple-500' },        // Chuông báo (9)
+            { icon: 'fa-stethoscope', color: 'text-cyan-500' }    // Ống nghe (10)
+        ];
+
+        // --- DATA LỊCH LÀM VIỆC ---
+        const schedules = [
+            { id: 't2', day: 'Thứ 2', time: '17:30 - 21:00', status: 'work', note: '', isExpanded: false, iconIndex: 0 },
+            { id: 't3', day: 'Thứ 3', time: '17:30 - 21:00', status: 'work', note: '', isExpanded: false, iconIndex: 0 },
+            { id: 't4', day: 'Thứ 4', time: '17:30 - 21:00', status: 'work', note: '', isExpanded: false, iconIndex: 0 },
+            { id: 't5', day: 'Thứ 5', time: '17:30 - 21:00', status: 'work', note: '', isExpanded: false, iconIndex: 0 },
+            { id: 't6', day: 'Thứ 6', time: '17:30 - 21:00', status: 'work', note: '', isExpanded: false, iconIndex: 0 },
+            { id: 't7s', day: 'Thứ 7 (Sáng)', time: '07:00 - 11:00', status: 'work', note: '', isExpanded: false, iconIndex: 1 }, // Default to star
+            { id: 't7c', day: 'Thứ 7 (Chiều)', time: '17:30 - 21:00', status: 'work', note: '', isExpanded: false, iconIndex: 1 }, // Default to star
+            { id: 'cns', day: 'Chủ Nhật (Sáng)', time: '07:00 - 11:00', status: 'work', note: '', isExpanded: false, iconIndex: 2 }, // Default to heart
+            { id: 'cnc', day: 'Chủ Nhật (Chiều)', time: '17:30 - 21:00', status: 'work', note: '', isExpanded: false, iconIndex: 2 }, // Default to heart
+        ];
+
+        // --- HỆ THỐNG HOA VĂN (PATTERNS) ---
+        const bgPatterns = {
+            hearts: `<svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><path d="M20 31.7l-1.3-1.2C12.9 25.3 9 21.9 9 17.7c0-3.4 2.6-6 6-6 1.9 0 3.8.9 4.9 2.3 1.1-1.4 3-2.3 4.9-2.3 3.4 0 6 2.6 6 6 0 4.2-3.9 7.6-9.7 12.8L20 31.7z" fill="currentColor" fill-rule="evenodd"/></svg>`,
+            medical: `<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M11 11V7h2v4h4v2h-4v4h-2v-4H7v-2h4z" fill="currentColor" fill-rule="evenodd"/></svg>`,
+            waves: `<svg width="60" height="12" viewBox="0 0 60 12" xmlns="http://www.w3.org/2000/svg"><path d="M30 6C20 6 15 0 0 0v12c15 0 20-6 30-6s15 6 30 6V0c-15 0-20 6-30 6z" fill="currentColor" fill-rule="evenodd"/></svg>`,
+            leaves: `<svg width="30" height="30" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg"><path d="M15 0C8 0 0 8 0 15v15h15c7 0 15-8 15-15V0H15zm0 28C9 28 2 21 2 15V2h13c7 0 14 7 14 13v13H15z" fill="currentColor" fill-rule="evenodd"/></svg>`,
+            circles: `<svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><circle cx="20" cy="20" r="18" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="20" cy="20" r="8" fill="none" stroke="currentColor" stroke-width="1"/></svg>`,
+            grid: `<svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M20 0v20H0V0h20zm-1 1H1v18h18V1z" fill="currentColor" fill-rule="evenodd"/></svg>`,
+            diamonds: `<svg width="30" height="30" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg"><path d="M15 0L30 15L15 30L0 15z" fill="none" stroke="currentColor" stroke-width="1" fill-rule="evenodd"/></svg>`,
+            dots: `<svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><circle cx="3" cy="3" r="2" fill="currentColor"/></svg>`,
+            triangles: `<svg width="30" height="30" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg"><path d="M15 0l15 30H0z" fill="none" stroke="currentColor" stroke-width="1" fill-rule="evenodd"/></svg>`,
+            flower: `<svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><path d="M30 10 Q40 5 45 15 Q55 20 45 30 Q55 40 45 45 Q40 55 30 45 Q20 55 15 45 Q5 40 15 30 Q5 20 15 15 Q20 5 30 10 Z" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="30" cy="30" r="5" fill="currentColor"/></svg>`,
+            vintage: `<svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><path d="M20 0 C20 10 30 10 30 20 C30 30 20 30 20 40 C20 30 10 30 10 20 C10 10 20 10 20 0 Z" fill="currentColor" opacity="0.6"/></svg>`,
+            lotus: `<svg width="50" height="50" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg"><path d="M25 10 C30 20 40 25 45 25 C35 30 30 40 25 45 C20 40 15 30 5 25 C10 25 20 20 25 10 Z" fill="currentColor" opacity="0.8"/></svg>`
+        };
+
+        // --- DATA THEMES ---
+        const themes = [
+            { id: 1, name: 'Hồng Ấm Áp', bg: 'bg-gradient-to-br from-rose-50 to-pink-100', text: 'text-rose-950', boxBorder: 'border-rose-200/80', accent: 'bg-rose-400', iconColor: 'text-rose-500', patternType: 'flower', pColor: '#e11d48', pOpacity: 0.05, watermark: 'fa-baby-carriage', innerBorder: 'border-rose-300 border-solid border-[2px]' },
+            { id: 2, name: 'Trắng Tinh Khiết', bg: 'bg-white', text: 'text-slate-800', boxBorder: 'border-slate-200', accent: 'bg-rose-300', iconColor: 'text-rose-400', patternType: 'vintage', pColor: '#cbd5e1', pOpacity: 0.15, watermark: 'fa-stethoscope', innerBorder: 'border-rose-200 border-double border-[5px]' },
+            { id: 3, name: 'Xanh Hy Vọng', bg: 'bg-gradient-to-br from-sky-50 to-blue-100', text: 'text-sky-950', boxBorder: 'border-sky-200/80', accent: 'bg-sky-500', iconColor: 'text-sky-600', patternType: 'medical', pColor: '#0284c7', pOpacity: 0.05, watermark: 'fa-kit-medical', innerBorder: 'border-sky-300 border-dashed border-[2px]' },
+            { id: 4, name: 'Tím Bình Yên', bg: 'bg-gradient-to-br from-fuchsia-50 to-purple-100', text: 'text-purple-950', boxBorder: 'border-purple-200/80', accent: 'bg-purple-500', iconColor: 'text-purple-600', patternType: 'lotus', pColor: '#9333ea', pOpacity: 0.05, watermark: 'fa-spa', innerBorder: 'border-purple-300 border-solid border-[3px]' },
+            { id: 5, name: 'Xanh Ngọc Bích', bg: 'bg-gradient-to-br from-teal-50 to-emerald-100', text: 'text-teal-950', boxBorder: 'border-teal-200/80', accent: 'bg-teal-500', iconColor: 'text-teal-600', patternType: 'leaves', pColor: '#0d9488', pOpacity: 0.05, watermark: 'fa-leaf', innerBorder: 'border-teal-400/60 border-dotted border-[4px]' },
+            { id: 6, name: 'Be Nhã Nhặn', bg: 'bg-gradient-to-br from-stone-50 to-orange-50', text: 'text-stone-800', boxBorder: 'border-stone-200', accent: 'bg-stone-400', iconColor: 'text-stone-500', patternType: 'lotus', pColor: '#78716c', pOpacity: 0.05, watermark: 'fa-notes-medical', innerBorder: 'border-stone-300 border-solid border-[1px]' },
+            { id: 7, name: 'Hồng Cẩm Thạch', bg: 'bg-gradient-to-br from-red-50 via-rose-50 to-pink-50', text: 'text-rose-900', boxBorder: 'border-rose-200', accent: 'bg-rose-500', iconColor: 'text-rose-500', patternType: 'waves', pColor: '#be123c', pOpacity: 0.04, watermark: 'fa-heart-pulse', innerBorder: 'border-rose-200 border-double border-[6px]' },
+            { id: 8, name: 'Xanh Bác Sĩ', bg: 'bg-gradient-to-br from-slate-800 to-blue-950', text: 'text-blue-50', boxBorder: 'border-blue-700/50', accent: 'bg-blue-400', iconColor: 'text-blue-300', patternType: 'grid', pColor: '#93c5fd', pOpacity: 0.05, watermark: 'fa-user-doctor', innerBorder: 'border-blue-500/30 border-solid border-[2px]' },
+            { id: 9, name: 'Vàng Nắng Sớm', bg: 'bg-gradient-to-br from-amber-50 to-yellow-50', text: 'text-amber-900', boxBorder: 'border-amber-200/80', accent: 'bg-amber-500', iconColor: 'text-amber-500', patternType: 'circles', pColor: '#d97706', pOpacity: 0.05, watermark: 'fa-sun', innerBorder: 'border-amber-300 border-dashed border-[2px]' },
+            { id: 10, name: 'Tím Hoàng Gia', bg: 'bg-gradient-to-br from-indigo-900 to-purple-900', text: 'text-purple-50', boxBorder: 'border-purple-700/50', accent: 'bg-purple-400', iconColor: 'text-purple-300', patternType: 'diamonds', pColor: '#d8b4fe', pOpacity: 0.05, watermark: 'fa-star-of-life', innerBorder: 'border-purple-400/40 border-double border-[4px]' },
+            { id: 11, name: 'Hồng Đào Tươi', bg: 'bg-gradient-to-br from-red-50 to-orange-50', text: 'text-red-950', boxBorder: 'border-red-200/80', accent: 'bg-red-400', iconColor: 'text-red-500', patternType: 'hearts', pColor: '#ef4444', pOpacity: 0.05, watermark: 'fa-person-pregnant', innerBorder: 'border-red-300 border-solid border-[2px]' },
+            { id: 12, name: 'Tím Phấn Mơ', bg: 'bg-gradient-to-br from-fuchsia-100 to-pink-50', text: 'text-fuchsia-950', boxBorder: 'border-fuchsia-200/80', accent: 'bg-fuchsia-400', iconColor: 'text-fuchsia-500', patternType: 'flower', pColor: '#d946ef', pOpacity: 0.06, watermark: 'fa-venus', innerBorder: 'border-fuchsia-300 border-dashed border-[2px]' },
+            { id: 13, name: 'Sữa Ngọt Ngào', bg: 'bg-gradient-to-tr from-orange-50 via-white to-rose-50', text: 'text-stone-800', boxBorder: 'border-rose-200', accent: 'bg-rose-300', iconColor: 'text-rose-400', patternType: 'vintage', pColor: '#f43f5e', pOpacity: 0.03, watermark: 'fa-spa', innerBorder: 'border-rose-200 border-double border-[4px]' },
+            { id: 14, name: 'Đỏ Rượu Vang', bg: 'bg-gradient-to-br from-rose-900 to-red-950', text: 'text-rose-50', boxBorder: 'border-rose-700/50', accent: 'bg-rose-400', iconColor: 'text-rose-300', patternType: 'diamonds', pColor: '#fda4af', pOpacity: 0.06, watermark: 'fa-gem', innerBorder: 'border-rose-500/40 border-solid border-[3px]' },
+            { id: 15, name: 'Xanh Mint Dịu', bg: 'bg-gradient-to-br from-teal-50 to-emerald-50', text: 'text-teal-950', boxBorder: 'border-teal-200/80', accent: 'bg-teal-400', iconColor: 'text-teal-500', patternType: 'leaves', pColor: '#14b8a6', pOpacity: 0.05, watermark: 'fa-leaf', innerBorder: 'border-teal-300 border-dotted border-[3px]' }
+        ];
+
+        let currentThemeId = 1;
+
+        // --- KHỞI TẠO ỨNG DỤNG ---
+        function initApp() {
+            renderScheduleControls();
+            renderThemeControls();
+            applyTheme(currentThemeId);
+            updatePreview();
+            adjustScale(); // Điều chỉnh tỷ lệ khung nhìn
+            window.addEventListener('resize', adjustScale);
+        }
+
+        // --- ĐIỀU CHỈNH TỶ LỆ XEM TRƯỚC DỰA TRÊN MÀN HÌNH ---
+        function adjustScale() {
+            const wrapper = document.getElementById('preview-wrapper');
+            const card = document.getElementById('preview-card');
+            const containerWidth = wrapper.parentElement.clientWidth - 32; // padding
+            
+            if (containerWidth < 440) {
+                const scale = containerWidth / 440;
+                card.style.transform = `scale(${scale})`;
+                wrapper.style.height = `${card.offsetHeight * scale}px`;
+                wrapper.style.width = `${containerWidth}px`;
+            } else {
+                card.style.transform = `scale(1)`;
+                wrapper.style.height = `${card.offsetHeight}px`;
+                wrapper.style.width = `440px`;
+            }
+        }
+
+        // --- RENDER BẢNG ĐIỀU KHIỂN LỊCH (CHẾ ĐỘ ẨN/HIỆN ACCORDION) ---
+        function renderScheduleControls() {
+            const container = document.getElementById('schedule-controls');
+            container.innerHTML = '';
+
+            schedules.forEach((item, index) => {
+                const isWeekend = item.day.includes('Thứ 7') || item.day.includes('Chủ Nhật');
+                const dayColor = isWeekend ? 'text-red-600' : 'text-gray-800';
+                const currentIcon = dayIcons[item.iconIndex];
+
+                const html = `
+                    <div class="flex flex-col p-3 rounded-xl border ${item.status === 'work' ? 'border-blue-200 bg-blue-50/40' : 'border-gray-200 bg-gray-50'} transition-all duration-300 shadow-sm overflow-hidden">
+                        
+                        <!-- Dòng hiển thị ngày (Click để mở) -->
+                        <div class="flex items-center justify-between cursor-pointer" onclick="toggleEdit(${index})">
+                            <div class="flex flex-col w-full">
+                                <div class="flex items-center gap-2.5">
+                                    <button onclick="event.stopPropagation(); cycleIcon(${index})" class="w-[28px] h-[28px] shrink-0 flex items-center justify-center rounded-full bg-white border border-gray-200 hover:bg-gray-100 transition-colors shadow-sm active:scale-90" title="Nhấp để đổi biểu tượng">
+                                        <i class="fa-solid ${currentIcon.icon} ${currentIcon.color} text-[12px]"></i>
+                                    </button>
+                                    <span class="font-bold text-[15px] ${dayColor}">${item.day}</span>
+                                </div>
+                                ${!item.isExpanded ? `<span class="text-[12px] text-gray-500 mt-1 font-medium ml-[38px]"><i class="fa-regular fa-clock"></i> ${item.status === 'work' ? item.time : '<span class="text-red-500 font-bold">Nghỉ</span>'} ${item.note ? ` <span class="opacity-60">| ${item.note}</span>` : ''}</span>` : ''}
+                            </div>
+                            <div class="flex items-center gap-2 pl-3">
+                                <!-- Nút đổi nhanh trạng thái khi thu gọn -->
+                                ${!item.isExpanded ? `<button onclick="event.stopPropagation(); toggleStatus(${index})" class="cursor-pointer active:scale-90 px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all duration-200 shadow-sm ${item.status === 'work' ? 'bg-blue-100 text-blue-600 border border-blue-200 hover:bg-blue-200' : 'bg-red-100 text-red-500 border border-red-200 hover:bg-red-200'}">${item.status === 'work' ? 'Làm' : 'Nghỉ'}</button>` : ''}
+                                <i class="fa-solid fa-chevron-${item.isExpanded ? 'up' : 'down'} text-gray-400 text-sm"></i>
+                            </div>
+                        </div>
+
+                        <!-- Khối chỉnh sửa (Chỉ hiện khi Click) -->
+                        ${item.isExpanded ? `
+                        <div class="flex flex-col gap-3 mt-3 pt-3 border-t border-gray-200/80 pl-[38px]">
+                            <!-- Công tắc Toggle Trượt Mượt Mà -->
+                            <div class="relative flex bg-gray-200/80 rounded-lg p-0.5 w-[140px] cursor-pointer shadow-inner select-none active:scale-[0.98] transition-transform" onclick="event.stopPropagation(); toggleStatus(${index})">
+                                <!-- Thanh trượt nền trắng -->
+                                <div class="absolute top-0.5 bottom-0.5 w-[calc(50%-2px)] bg-white rounded-md shadow-sm transition-all duration-300 ease-in-out ${item.status === 'work' ? 'left-0.5' : 'left-[calc(50%+1px)]'}"></div>
+                                
+                                <div class="relative flex-1 flex items-center justify-center py-1.5 text-xs font-bold z-10 transition-colors duration-300 ${item.status === 'work' ? 'text-blue-600' : 'text-gray-500'}">Làm</div>
+                                <div class="relative flex-1 flex items-center justify-center py-1.5 text-xs font-bold z-10 transition-colors duration-300 ${item.status === 'off' ? 'text-red-500' : 'text-gray-500'}">Nghỉ</div>
+                            </div>
+
+                            <div class="flex items-center text-sm text-gray-600 bg-white border border-gray-300 rounded-lg px-3 py-2 shadow-sm focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500 transition-all">
+                                <i class="fa-regular fa-clock mr-2.5 text-gray-400"></i>
+                                <input type="text" value="${item.time}" oninput="updateTime(${index}, this.value)" onclick="event.stopPropagation()" class="w-full outline-none bg-transparent text-gray-800 text-[14px] font-semibold h-full">
+                            </div>
+                            <input type="text" placeholder="Ghi chú (VD: Khám thai, Nghỉ bù...)" value="${item.note || ''}" oninput="updateNote(${index}, this.value)" onclick="event.stopPropagation()" class="w-full text-[13px] border border-gray-300 rounded-lg px-3 py-2.5 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none text-gray-800 bg-white">
+                        </div>
+                        ` : ''}
+                    </div>
+                `;
+                container.innerHTML += html;
+            });
+        }
+
+        // --- CÁC HÀM XỬ LÝ SỰ KIỆN LỊCH ---
+        function toggleEdit(index) {
+            schedules[index].isExpanded = !schedules[index].isExpanded;
+            renderScheduleControls();
+        }
+
+        function toggleStatus(index) {
+            schedules[index].status = schedules[index].status === 'work' ? 'off' : 'work';
+            renderScheduleControls();
+            updatePreview();
+        }
+
+        function updateTime(index, value) {
+            schedules[index].time = value;
+            updatePreview();
+        }
+
+        function updateNote(index, value) {
+            schedules[index].note = value;
+            updatePreview();
+        }
+
+        function cycleIcon(index) {
+            // Tăng index icon lên 1, nếu vượt quá số lượng icon thì quay về 0
+            schedules[index].iconIndex = (schedules[index].iconIndex + 1) % dayIcons.length;
+            renderScheduleControls();
+            updatePreview();
+        }
+
+        // --- RENDER BẢNG CHỌN THEME ---
+        function renderThemeControls() {
+            const container = document.getElementById('theme-controls');
+            container.innerHTML = '';
+
+            themes.forEach(theme => {
+                const isActive = theme.id === currentThemeId;
+                
+                // Trích xuất background để hiện thị cục màu nhỏ
+                let bgStyle = '';
+                if(theme.bg.includes('bg-gradient')){
+                    bgStyle = theme.bg;
+                } else if(theme.bg.includes('bg-white')){
+                    bgStyle = 'bg-white border-2 border-gray-200';
+                } else {
+                    bgStyle = theme.bg;
+                }
+
+                const html = `
+                    <button onclick="applyTheme(${theme.id})" title="${theme.name}" class="relative flex flex-col items-center gap-1.5 group flex-shrink-0 snap-center w-[72px]">
+                        <div class="w-14 h-14 rounded-full ${bgStyle} border-2 ${isActive ? 'border-blue-500 scale-105 shadow-lg' : 'border-transparent shadow-sm'} transition-all duration-200 flex items-center justify-center">
+                            ${isActive ? '<i class="fa-solid fa-check text-white drop-shadow-md text-base"></i>' : ''}
+                        </div>
+                        <span class="text-[11px] ${isActive ? 'text-blue-700 font-bold' : 'text-gray-500 font-medium'} group-hover:text-gray-800 text-center leading-tight h-8 flex items-start justify-center w-full px-1">${theme.name}</span>
+                    </button>
+                `;
+                container.innerHTML += html;
+            });
+        }
+
+        // --- ÁP DỤNG THEME ---
+        function applyTheme(id) {
+            currentThemeId = id;
+            renderThemeControls();
+
+            const theme = themes.find(t => t.id === id);
+            const card = document.getElementById('preview-card');
+            const decorator = document.getElementById('theme-decorator');
+            const innerBorderLayer = document.getElementById('theme-inner-border');
+            const logo = document.getElementById('clinic-logo');
+            const scheduleBox = document.getElementById('preview-schedule-box');
+            
+            const patternLayer = document.getElementById('theme-pattern');
+            const watermarkLayer = document.getElementById('theme-watermark');
+            const doctorBox = document.getElementById('preview-doctor-box');
+            const phoneBox = document.getElementById('preview-phone-box');
+            const dateRange = document.getElementById('preview-date-range');
+
+            // Cập nhật background
+            card.className = 'p-5 rounded-2xl shadow-2xl relative transition-all duration-500 overflow-hidden';
+            card.className += ` ${theme.bg} ${theme.text}`;
+            
+            // Cập nhật decorator (top bar) & inner border
+            decorator.className = `absolute top-0 left-0 w-full h-2 z-30 ${theme.accent}`;
+            if (innerBorderLayer) {
+                innerBorderLayer.className = `absolute inset-1.5 z-20 pointer-events-none rounded-xl transition-all duration-300 ${theme.innerBorder}`;
+            }
+
+            // Cập nhật logo
+            if(logo) {
+                logo.className = `w-[100px] h-[100px] rounded-[22px] bg-white p-1.5 object-contain shadow-[0_4px_15px_-3px_rgba(0,0,0,0.1)] border-2 transition-colors duration-300 ${theme.boxBorder}`;
+            }
+            
+            // Cập nhật Hoa Văn (Pattern)
+            const svgPattern = bgPatterns[theme.patternType].replace('currentColor', encodeURIComponent(theme.pColor));
+            patternLayer.style.backgroundImage = `url("data:image/svg+xml,${svgPattern}")`;
+            patternLayer.style.opacity = theme.pOpacity;
+            
+            // Cập nhật Watermark
+            watermarkLayer.innerHTML = `<i class="fa-solid ${theme.watermark}"></i>`;
+
+            // Style Hộp Lịch
+            scheduleBox.className = `backdrop-blur-md rounded-xl p-3 shadow-sm border transition-colors duration-300 ${theme.boxBorder}`;
+            
+            // Đặc biệt cho theme nền tối (8, 10, 14)
+            if (id === 8 || id === 10 || id === 14) {
+                scheduleBox.className += ' bg-black/20 border-opacity-30';
+                card.style.border = '1px solid rgba(255,255,255,0.1)';
+                dateRange.className = 'text-[12px] font-medium opacity-90 italic text-white/80';
+                
+                // Doctor Box Dark Mode
+                doctorBox.className = 'mb-2 bg-black/40 rounded-xl py-2 px-2 shadow-sm flex flex-col items-center border border-white/10 backdrop-blur-md';
+                phoneBox.className = 'inline-flex items-center justify-center gap-2 font-bold text-[15px] bg-black/60 px-4 py-1.5 rounded-full shadow-md border border-white/10';
+            } else {
+                scheduleBox.className += ' bg-white/60';
+                card.style.border = 'none';
+                dateRange.className = `text-[12px] font-medium opacity-90 italic ${theme.text}`;
+                
+                // Doctor Box Light Mode
+                doctorBox.className = 'mb-2 bg-white/40 rounded-xl py-2 px-2 shadow-sm flex flex-col items-center border border-white/40 backdrop-blur-md';
+                phoneBox.className = `inline-flex items-center justify-center gap-2 font-bold text-[15px] bg-white px-4 py-1.5 rounded-full shadow-md ${theme.text}`;
+            }
+
+            updatePreview(); // Re-render text colors inside schedule based on theme
+        }
+
+        // --- CẬP NHẬT PREVIEW VÀ TÔ MÀU CUỐI TUẦN ---
+        function updatePreview() {
+            const listContainer = document.getElementById('preview-schedule-list');
+            listContainer.innerHTML = '';
+            const theme = themes.find(t => t.id === currentThemeId);
+            const isDarkTheme = theme.id === 8 || theme.id === 10 || theme.id === 14;
+
+            schedules.forEach(item => {
+                let statusHtml = '';
+                const isWeekend = item.day.includes('Thứ 7') || item.day.includes('Chủ Nhật');
+                const currentIcon = dayIcons[item.iconIndex];
+                let rowClass = 'flex flex-col py-1.5 border-b last:border-0 border-dashed ';
+                
+                // Tạo màu nhấn cho ngày cuối tuần
+                let dayColorClass = isWeekend ? (isDarkTheme ? 'text-amber-400' : 'text-red-600') : '';
+
+                if (item.status === 'work') {
+                    statusHtml = `<span class="font-bold">${item.time}</span>`;
+                    rowClass += isDarkTheme ? 'border-gray-600' : 'border-gray-300/80';
+                } else {
+                    statusHtml = `<span class="font-bold uppercase tracking-wider ${isDarkTheme ? 'text-red-400' : 'text-red-600'}">NGHỈ</span>`;
+                    rowClass += isDarkTheme ? 'border-gray-600 opacity-80' : 'border-gray-300/80 text-gray-500';
+                }
+
+                // Nếu có ghi chú sẽ hiển thị dòng nhỏ dưới thời gian
+                let noteHtml = item.note ? `<div class="text-[11.5px] font-semibold italic mt-0.5 text-left opacity-90 pl-[24px]">* ${item.note}</div>` : '';
+
+                const html = `
+                    <div class="${rowClass}">
+                        <div class="flex justify-between items-center w-full">
+                            <span class="${item.status === 'work' ? 'font-bold' : 'font-medium'} ${dayColorClass} flex items-center gap-2.5">
+                                <i class="fa-solid ${currentIcon.icon} ${currentIcon.color} text-[14px] drop-shadow-sm w-4 text-center"></i>
+                                ${item.day}
+                            </span>
+                            ${statusHtml}
+                        </div>
+                        ${noteHtml}
+                    </div>
+                `;
+                listContainer.innerHTML += html;
+            });
+            
+            // Recalculate height if needed
+            setTimeout(adjustScale, 50);
+        }
+
+        // --- XỬ LÝ NGÀY THÁNG ÁP DỤNG ---
+        function formatDate(dateString) {
+            if (!dateString) return "";
+            const parts = dateString.split('-');
+            if (parts.length === 3) {
+                return `${parts[2]}/${parts[1]}/${parts[0]}`;
+            }
+            return dateString;
+        }
+
+        function updateDateRange() {
+            const from = document.getElementById('date-from').value;
+            const to = document.getElementById('date-to').value;
+            const previewText = document.getElementById('preview-date-range');
+            
+            if (from && to) {
+                previewText.innerText = `(Áp dụng từ ${formatDate(from)} đến ${formatDate(to)})`;
+            } else if (from) {
+                previewText.innerText = `(Áp dụng từ ${formatDate(from)})`;
+            } else if (to) {
+                previewText.innerText = `(Áp dụng đến ${formatDate(to)})`;
+            } else {
+                previewText.innerText = "";
+            }
+        }
+
+        function setupDefaultDates() {
+            const getMonday = (d) => {
+                d = new Date(d);
+                let day = d.getDay(), diff = d.getDate() - day + (day == 0 ? -6:1);
+                return new Date(d.setDate(diff));
+            };
+            
+            const today = new Date();
+            const monday = getMonday(today);
+            const sunday = new Date(monday);
+            sunday.setDate(monday.getDate() + 6);
+            
+            const fmt = (date) => {
+                const offset = date.getTimezoneOffset();
+                let tzDate = new Date(date.getTime() - (offset*60*1000));
+                return tzDate.toISOString().split('T')[0];
+            };
+            
+            document.getElementById('date-from').value = fmt(monday);
+            document.getElementById('date-to').value = fmt(sunday);
+            updateDateRange();
+        }
+
+        function generateQRCode() {
+            const qrContainer = document.getElementById("qrcode");
+            qrContainer.innerHTML = ""; // Clear existing just in case
+            new QRCode(qrContainer, {
+                text: "https://maps.app.goo.gl/pjDpDEKXcv2rqFNG7",
+                width: 64,
+                height: 64,
+                colorDark : "#1f2937",
+                colorLight : "#ffffff",
+                correctLevel : QRCode.CorrectLevel.L
+            });
+        }
+
+        // --- KHỞI TẠO ỨNG DỤNG ---
+        function initApp() {
+            setupDefaultDates();
+            generateQRCode();
+            renderScheduleControls();
+            renderThemeControls();
+            applyTheme(currentThemeId);
+            updatePreview();
+            adjustScale(); // Điều chỉnh tỷ lệ khung nhìn
+            window.addEventListener('resize', adjustScale);
+        }
+
+        // --- XUẤT ẢNH 2K VÀ CHIA SẺ ---
+        
+        function showLoading() {
+            document.getElementById('loading-modal').style.display = 'flex';
+        }
+
+        function hideLoading() {
+            document.getElementById('loading-modal').style.display = 'none';
+        }
+
+        // Chụp ảnh bằng html2canvas với chuẩn 2K
+        async function getCanvas() {
+            const card = document.getElementById('preview-card');
+            
+            // Backup current inline styles
+            const oldTransform = card.style.transform;
+            card.style.transform = 'scale(1)'; // Force real size for accuracy
+            
+            showLoading();
+
+            try {
+                // scale: 5 kết hợp chiều ngang 440px -> Xuất ảnh width ~2200px (Chuẩn 2K nét căng)
+                const canvas = await html2canvas(card, {
+                    scale: 5, 
+                    useCORS: true,
+                    backgroundColor: null, 
+                    logging: false
+                });
+                return canvas;
+            } catch (error) {
+                console.error("Lỗi khi tạo ảnh:", error);
+                alert("Đã xảy ra lỗi khi tạo ảnh. Vui lòng thử lại.");
+                return null;
+            } finally {
+                // Restore transform
+                card.style.transform = oldTransform;
+                hideLoading();
+            }
+        }
+
+        async function saveImage() {
+            const canvas = await getCanvas();
+            if(!canvas) return;
+
+            const link = document.createElement('a');
+            link.download = 'Thong-Bao-Lich-Lam-Viec-Binh-Minh-HD.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+
+        async function shareImage() {
+            const canvas = await getCanvas();
+            if(!canvas) return;
+
+            canvas.toBlob(async (blob) => {
+                const file = new File([blob], "Lich-Lam-Viec.png", { type: "image/png" });
+                
+                // Kiểm tra xem trình duyệt có hỗ trợ chia sẻ File ảnh không
+                if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                    try {
+                        await navigator.share({
+                            files: [file],
+                            title: 'Lịch Làm Việc - PK Bình Minh',
+                            text: 'Gửi bạn lịch làm việc cập nhật mới nhất của BS. Lê Đàm Vân.'
+                        });
+                    } catch (error) {
+                        console.log('Chia sẻ bị huỷ hoặc lỗi:', error);
+                    }
+                } else {
+                    alert('Trình duyệt hoặc thiết bị của bạn không hỗ trợ tính năng chia sẻ ảnh trực tiếp. Vui lòng sử dụng tính năng Lưu Ảnh HD 2K.');
+                }
+            }, 'image/png');
+        }
+
+        // Chạy ngay khi tải trang
+        document.addEventListener('DOMContentLoaded', initApp);
+
+    </script>
+</body>
+</html>
