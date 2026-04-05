@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Tạo Lịch Làm Việc - PK Bình Minh</title>
+    <title>Lịch Làm Việc - PK Bình Minh</title>
     
     <!-- Cấu hình Web App / PWA (Thêm vào màn hình chính) -->
     <meta name="mobile-web-app-capable" content="yes">
@@ -609,16 +609,19 @@
         }
 
         function setupDefaultDates() {
-            const getMonday = (d) => {
-                d = new Date(d);
-                let day = d.getDay(), diff = d.getDate() - day + (day == 0 ? -6:1);
-                return new Date(d.setDate(diff));
-            };
-            
             const today = new Date();
-            const monday = getMonday(today);
-            const sunday = new Date(monday);
-            sunday.setDate(monday.getDate() + 6);
+            
+            // Tìm ngày Thứ 2 kế tiếp so với ngày hiện tại
+            let daysUntilNextMonday = (1 - today.getDay() + 7) % 7;
+            // Nếu hôm nay đã là Thứ 2, lấy Thứ 2 của tuần sau (cộng thêm 7 ngày)
+            if (daysUntilNextMonday === 0) daysUntilNextMonday = 7; 
+            
+            const nextMonday = new Date(today);
+            nextMonday.setDate(today.getDate() + daysUntilNextMonday);
+            
+            // Tìm ngày Chủ nhật của 4 tuần sau (cộng thêm 27 ngày tính từ Thứ 2 đó)
+            const endSunday = new Date(nextMonday);
+            endSunday.setDate(nextMonday.getDate() + 27);
             
             const fmt = (date) => {
                 const offset = date.getTimezoneOffset();
@@ -626,8 +629,8 @@
                 return tzDate.toISOString().split('T')[0];
             };
             
-            document.getElementById('date-from').value = fmt(monday);
-            document.getElementById('date-to').value = fmt(sunday);
+            document.getElementById('date-from').value = fmt(nextMonday);
+            document.getElementById('date-to').value = fmt(endSunday);
             updateDateRange();
         }
 
