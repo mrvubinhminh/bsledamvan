@@ -241,16 +241,16 @@
     <script>
         // --- DANH SÁCH 10 ICON SINH ĐỘNG ---
         const dayIcons = [
-            { icon: 'fa-sun', color: 'text-amber-500' },          // Nắng (1)
-            { icon: 'fa-star', color: 'text-yellow-400' },        // Sao (2)
-            { icon: 'fa-heart', color: 'text-rose-500' },         // Tim (3)
-            { icon: 'fa-leaf', color: 'text-green-500' },         // Lá (4)
-            { icon: 'fa-seedling', color: 'text-emerald-500' },   // Mầm non (5)
-            { icon: 'fa-clover', color: 'text-teal-500' },        // Cỏ 4 lá (6)
-            { icon: 'fa-calendar-check', color: 'text-blue-500' },// Lịch (7)
-            { icon: 'fa-clock', color: 'text-indigo-500' },       // Đồng hồ (8)
-            { icon: 'fa-bell', color: 'text-purple-500' },        // Chuông báo (9)
-            { icon: 'fa-stethoscope', color: 'text-cyan-500' }    // Ống nghe (10)
+            { icon: 'fa-calendar-check', color: 'text-green-600' }, // Mặc định xanh lá
+            { icon: 'fa-sun', color: 'text-amber-500' },          // Nắng
+            { icon: 'fa-star', color: 'text-yellow-400' },        // Sao
+            { icon: 'fa-heart', color: 'text-rose-500' },         // Tim
+            { icon: 'fa-leaf', color: 'text-emerald-500' },       // Lá
+            { icon: 'fa-clover', color: 'text-teal-500' },        // Cỏ 4 lá
+            { icon: 'fa-clock', color: 'text-indigo-500' },       // Đồng hồ
+            { icon: 'fa-bell', color: 'text-purple-500' },        // Chuông báo
+            { icon: 'fa-stethoscope', color: 'text-cyan-500' },   // Ống nghe
+            { icon: 'fa-user-doctor', color: 'text-blue-500' }    // Bác sĩ
         ];
 
         // --- DATA LỊCH LÀM VIỆC ---
@@ -260,10 +260,10 @@
             { id: 't4', day: 'Thứ 4', time: '17:30 - 21:00', status: 'work', note: '', isExpanded: false, iconIndex: 0 },
             { id: 't5', day: 'Thứ 5', time: '17:30 - 21:00', status: 'work', note: '', isExpanded: false, iconIndex: 0 },
             { id: 't6', day: 'Thứ 6', time: '17:30 - 21:00', status: 'work', note: '', isExpanded: false, iconIndex: 0 },
-            { id: 't7s', day: 'Thứ 7 (Sáng)', time: '07:00 - 11:00', status: 'work', note: '', isExpanded: false, iconIndex: 1 }, // Default to star
-            { id: 't7c', day: 'Thứ 7 (Chiều)', time: '17:30 - 21:00', status: 'work', note: '', isExpanded: false, iconIndex: 1 }, // Default to star
-            { id: 'cns', day: 'Chủ Nhật (Sáng)', time: '07:00 - 11:00', status: 'work', note: '', isExpanded: false, iconIndex: 2 }, // Default to heart
-            { id: 'cnc', day: 'Chủ Nhật (Chiều)', time: '17:30 - 21:00', status: 'work', note: '', isExpanded: false, iconIndex: 2 }, // Default to heart
+            { id: 't7s', day: 'Thứ 7 (Sáng)', time: '07:00 - 11:00', status: 'work', note: '', isExpanded: false, iconIndex: 0 }, 
+            { id: 't7c', day: 'Thứ 7 (Chiều)', time: '17:30 - 21:00', status: 'work', note: '', isExpanded: false, iconIndex: 0 }, 
+            { id: 'cns', day: 'Chủ Nhật (Sáng)', time: '07:00 - 11:00', status: 'work', note: '', isExpanded: false, iconIndex: 0 }, 
+            { id: 'cnc', day: 'Chủ Nhật (Chiều)', time: '17:30 - 21:00', status: 'work', note: '', isExpanded: false, iconIndex: 0 }, 
         ];
 
         // --- HỆ THỐNG HOA VĂN (PATTERNS) ---
@@ -348,9 +348,12 @@
             container.innerHTML = '';
 
             schedules.forEach((item, index) => {
-                const isWeekend = item.day.includes('Thứ 7') || item.day.includes('Chủ Nhật');
-                const dayColor = isWeekend ? 'text-red-600' : 'text-gray-800';
-                const currentIcon = dayIcons[item.iconIndex];
+                const dayColor = item.status === 'off' ? 'text-red-500' : 'text-gray-800';
+                
+                let currentIcon = { icon: dayIcons[item.iconIndex].icon, color: 'text-blue-500' };
+                if (item.status === 'off') {
+                    currentIcon = { icon: 'fa-circle-xmark', color: 'text-red-500' };
+                }
 
                 const html = `
                     <div class="flex flex-col p-3 rounded-xl border ${item.status === 'work' ? 'border-blue-200 bg-blue-50/40' : 'border-gray-200 bg-gray-50'} transition-all duration-300 shadow-sm overflow-hidden">
@@ -532,12 +535,22 @@
 
             schedules.forEach(item => {
                 let statusHtml = '';
-                const isWeekend = item.day.includes('Thứ 7') || item.day.includes('Chủ Nhật');
-                const currentIcon = dayIcons[item.iconIndex];
+                
+                // Lấy màu icon theo thiết lập hoặc chỉnh sáng lên nếu đang dùng Theme tối
+                let iconBaseColor = dayIcons[item.iconIndex].color;
+                if (isDarkTheme) {
+                    iconBaseColor = iconBaseColor.replace('600', '400').replace('500', '400');
+                }
+                
+                let currentIcon = { icon: dayIcons[item.iconIndex].icon, color: iconBaseColor };
+                if (item.status === 'off') {
+                    currentIcon = { icon: 'fa-circle-xmark', color: isDarkTheme ? 'text-red-400' : 'text-red-600' };
+                }
+                
                 let rowClass = 'flex flex-col py-1.5 border-b last:border-0 border-dashed ';
                 
-                // Tạo màu nhấn cho ngày cuối tuần
-                let dayColorClass = isWeekend ? (isDarkTheme ? 'text-amber-400' : 'text-red-600') : '';
+                // Thay đổi màu nhấn dựa trên trạng thái làm/nghỉ thay vì cuối tuần
+                let dayColorClass = item.status === 'off' ? (isDarkTheme ? 'text-red-400' : 'text-red-600') : '';
 
                 if (item.status === 'work') {
                     statusHtml = `<span class="font-bold">${item.time}</span>`;
