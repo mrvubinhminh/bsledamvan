@@ -2,765 +2,1181 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Lịch Làm Việc - PK Bình Minh</title>
-    
-    <!-- Cấu hình Web App / PWA (Thêm vào màn hình chính) -->
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="Lịch Bình Minh">
-    <link rel="apple-touch-icon" href="https://i.ibb.co/RTVKhSqC/1938fb385874.jpg">
-    
-    <!-- Favicon BM cho trình duyệt -->
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23e11d48%22/><text x=%2250%25%22 y=%2250%25%22 font-family=%22Arial, sans-serif%22 font-size=%2250%22 font-weight=%22bold%22 fill=%22white%22 dominant-baseline=%22central%22 text-anchor=%22middle%22>BM</text></svg>" type="image/svg+xml">
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- html2canvas for high-res image export -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài Giảng: Soi Cổ Tử Cung Thai Kỳ</title>
+    <!-- Thư viện Icon FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Thư viện html2canvas để chụp ảnh slide -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <!-- QRCode.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'system-ui', 'sans-serif'],
-                        serif: ['Merriweather', 'serif']
-                    }
-                }
-            }
-        }
-    </script>
+    
     <style>
-        /* Đảm bảo khung ảnh xuất ra luôn giữ tỷ lệ đẹp kể cả trên mobile */
-        #preview-wrapper {
-            width: 440px; /* Đổi thành kích thước cố định để không co ảnh */
-            min-width: 440px;
-            margin: 0 auto;
+        :root {
+            /* Theme 1: Teal & Rose (Mặc định) */
+            --primary: #006064; 
+            --primary-light: #e0f2f1; 
+            --primary-border: #80cbc4; 
+            --accent: #c2185b; 
+            --accent-light: #fce4ec;
+            
+            /* Các màu cố định cho Trạng thái */
+            --success: #10b981; 
+            --success-light: #ecfdf5;
+            --danger: #ef4444; 
+            --danger-light: #fef2f2;
+            --text-main: #111827;
+            --text-muted: #4b5563;
+            --bg-body: #1f2937; 
+            --bg-slide: #ffffff;
+            --bg-card: rgba(255, 255, 255, 0.95);
+            --bg-quiz-btn: #f8fafc;
+            --bg-quiz-btn-hover: #f1f5f9;
         }
-        #preview-card {
-            width: 440px; /* Cố định kích thước để ảnh xuất ra đồng nhất */
-            transform-origin: top left;
+
+        /* Theme 2: Blue & Orange */
+        :root[data-theme="theme-blue"] {
+            --primary: #1e3a8a;
+            --primary-light: #eff6ff;
+            --primary-border: #93c5fd;
+            --accent: #ea580c;
+            --accent-light: #ffedd5;
         }
-        /* Hide scrollbar for the wrapper */
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
+
+        /* Theme 3: Green & Purple */
+        :root[data-theme="theme-green"] {
+            --primary: #064e3b;
+            --primary-light: #ecfdf5;
+            --primary-border: #6ee7b7;
+            --accent: #7e22ce;
+            --accent-light: #f3e8ff;
         }
-        .no-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
+
+        /* Theme 4: Dark Mode (Ban Đêm) */
+        :root[data-theme="theme-dark"] {
+            --primary: #22d3ee; 
+            --primary-light: #1e3a8a; 
+            --primary-border: #3b82f6; 
+            --accent: #f472b6; 
+            --accent-light: #4c0519; 
+            --text-main: #f9fafb; 
+            --text-muted: #d1d5db; 
+            --bg-body: #000000; 
+            --bg-slide: #111827; 
+            --bg-card: rgba(31, 41, 55, 0.95); 
+            --bg-quiz-btn: #374151; 
+            --bg-quiz-btn-hover: #4b5563; 
+        }
+
+        /* TIA LAZE XANH LÁ (Custom Cursor) */
+        body, .slide-wrapper, .slide-wrapper * {
+            cursor: url('data:image/svg+xml;utf8,<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="3" fill="%2300ff00"/><circle cx="12" cy="12" r="7" fill="none" stroke="%2300ff00" stroke-width="2" opacity="0.6"/></svg>') 12 12, auto !important;
+        }
+        
+        button, .theme-dot, .quiz-btn, .fullscreen-btn, .download-btn, .notes-btn, .toggle-image-btn {
+            cursor: pointer !important;
+        }
+
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            background-color: var(--bg-body);
+            background-image: radial-gradient(circle at center, #374151 0%, #111827 100%);
+            font-family: 'Times New Roman', Times, serif; 
+            display: flex; justify-content: center; align-items: center; overflow: hidden;
+            transition: all 0.5s ease;
+        }
+
+        #presentation-container {
+            position: relative; width: 100vw; height: 100vh;
+            display: flex; justify-content: center; align-items: center;
+        }
+
+        .slide-wrapper {
+            position: relative; background-color: var(--bg-slide);
+            background-image: 
+                radial-gradient(circle at 100% 100%, rgba(0,0,0, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 0% 0%, rgba(0,0,0, 0.08) 0%, transparent 40%);
+            aspect-ratio: 16 / 9; max-width: 100vw; max-height: 100vh; width: auto; height: 100vh;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6); overflow: hidden; display: flex; flex-direction: column;
+            transition: background-color 0.5s ease;
+        }
+
+        @media (min-aspect-ratio: 16/9) { .slide-wrapper { width: 100vw; height: auto; } }
+
+        .slide-wrapper::before, .slide-wrapper::after {
+            content: ''; position: absolute; width: 10vh; height: 10vh; z-index: 10; pointer-events: none;
+            transition: border-color 0.5s ease;
+        }
+        .slide-wrapper::before { top: 2vh; left: 2vh; border-top: 0.8vh solid var(--primary); border-left: 0.8vh solid var(--primary); }
+        .slide-wrapper::after { bottom: 0.5vh; right: 2vh; border-bottom: 0.8vh solid var(--accent); border-right: 0.8vh solid var(--accent); }
+
+        .inner-frame {
+            position: absolute; top: 3vh; bottom: 1.5vh; left: 3vh; right: 3vh;
+            border: 2px dashed var(--primary-border); pointer-events: none; z-index: 1;
+            transition: border-color 0.5s ease;
+        }
+
+        .slide {
+            display: none; flex: 1; padding: 5% 8%; box-sizing: border-box; flex-direction: column;
+            animation: fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1); z-index: 2;
+        }
+
+        .slide.active { display: flex; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.98) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .slide-header {
+            border-bottom: 3px solid var(--primary); padding-bottom: 1%; margin-bottom: 3%; position: relative; display: flex; align-items: center;
+            transition: border-color 0.5s ease;
+        }
+        
+        .slide-header::after {
+            content: ''; position: absolute; bottom: -5.5px; right: 0; width: 8px; height: 8px; background-color: var(--accent); border-radius: 50%;
+            transition: background-color 0.5s ease;
+        }
+
+        .slide-title {
+            color: var(--primary); font-size: 4.6vh; font-weight: 700; margin: 0; text-transform: uppercase;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1); letter-spacing: 1px; display: flex; align-items: center; gap: 15px; 
+            transition: color 0.5s ease;
+        }
+
+        .slide-title i {
+            color: var(--accent); font-size: 4.8vh; background: var(--primary-light); padding: 10px; border-radius: 10px; box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+            transition: all 0.5s ease;
+        }
+
+        .slide-content { flex: 1; font-size: 4.8vh; color: var(--text-main); display: flex; flex-direction: column; justify-content: center; transition: color 0.5s ease; }
+
+        .split-layout { display: flex; flex: 1; gap: 30px; align-items: center; height: 100%; width: 100%; transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);}
+        .split-layout .left-content { flex: 1; display: flex; flex-direction: column; justify-content: center; font-size: 4.4vh; color: var(--text-main); transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);}
+        .split-layout .right-image { flex: 1; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2vh; transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);}
+        
+        .image-caption-container { display: flex; flex-direction: column; align-items: center; width: fit-content; max-width: 100%; max-height: 100%; transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);}
+        .image-caption-container img { width: auto; max-width: 100%; max-height: 50vh; object-fit: contain; border-radius: 10px; border: 3px solid var(--primary-border); box-shadow: 0 8px 20px rgba(0,0,0,0.15); background: var(--bg-card); transition: all 0.5s ease; }
+        .dual-image-container .image-caption-container img { max-height: 25vh; }
+        .image-caption { width: 100%; max-width: 100%; text-align: center; font-size: 2.6vh; color: var(--text-muted); margin-top: 1.5vh; font-style: italic; line-height: 1.4; word-wrap: break-word; transition: all 0.5s ease;}
+
+        /* TRẠNG THÁI PHÓNG TO ẢNH (3/4 MÀN HÌNH CHUNG) */
+        .split-layout.image-expanded .left-content,
+        .split-layout.image-1-expanded .left-content,
+        .split-layout.image-2-expanded .left-content { flex: 0.35; font-size: 2.8vh; }
+        
+        .split-layout.image-expanded .left-content ul li,
+        .split-layout.image-1-expanded .left-content ul li,
+        .split-layout.image-2-expanded .left-content ul li { margin-bottom: 2vh; padding-left: 4.5vh; }
+        
+        .split-layout.image-expanded .left-content ul li::before,
+        .split-layout.image-1-expanded .left-content ul li::before,
+        .split-layout.image-2-expanded .left-content ul li::before { font-size: 2.8vh; top: 0.2vh; }
+        
+        .split-layout.image-expanded .right-image,
+        .split-layout.image-1-expanded .right-image,
+        .split-layout.image-2-expanded .right-image { flex: 0.65; }
+
+        /* TRẠNG THÁI PHÓNG TO: KHI CHỈ CÓ 1 ẢNH */
+        .split-layout.image-expanded .image-caption-container img { max-height: 70vh; }
+        .split-layout.image-expanded .image-caption { font-size: 2vh; }
+
+        /* TRẠNG THÁI PHÓNG TO: KHI CÓ 2 ẢNH VÀ CHỌN ẢNH 1 */
+        .split-layout.image-1-expanded .image-caption-container:nth-child(1) img { max-height: 70vh; }
+        .split-layout.image-1-expanded .image-caption-container:nth-child(1) .image-caption { font-size: 2vh; }
+        .split-layout.image-1-expanded .image-caption-container:nth-child(2) { display: none; }
+
+        /* TRẠNG THÁI PHÓNG TO: KHI CÓ 2 ẢNH VÀ CHỌN ẢNH 2 */
+        .split-layout.image-2-expanded .image-caption-container:nth-child(2) img { max-height: 70vh; }
+        .split-layout.image-2-expanded .image-caption-container:nth-child(2) .image-caption { font-size: 2vh; }
+        .split-layout.image-2-expanded .image-caption-container:nth-child(1) { display: none; }
+
+        ul { list-style-type: none; padding-left: 0; margin: 0; }
+        ul li { position: relative; padding-left: 7vh; margin-bottom: 4vh; line-height: 1.45; opacity: 0; transform: translateX(-30px); transition: opacity 0.5s ease-out, transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), font-size 0.5s ease, padding 0.5s ease, margin 0.5s ease; }
+        ul li.visible { opacity: 1; transform: translateX(0); }
+        ul li::before { content: '\f105'; font-family: "Font Awesome 6 Free"; font-weight: 900; position: absolute; left: 1.5vh; color: var(--accent); font-size: 4.4vh; top: 0.2vh; transition: transform 0.3s, color 0.5s ease, font-size 0.5s ease; }
+        ul li.visible::before { transform: scale(1.2); }
+
+        ul.ref-list li { font-size: 2.6vh; margin-bottom: 3vh; line-height: 1.5; padding-left: 5vh; text-align: justify; }
+        ul.ref-list li::before { font-size: 2.8vh; top: 0.2vh; }
+        ul.ref-list li strong { color: var(--primary); transition: color 0.5s ease; }
+
+        /* Slide Tiêu đề 01 */
+        .slide-title-main { text-align: center; justify-content: center; align-items: center; background: radial-gradient(circle, var(--primary-light) 0%, transparent 70%); transition: background 0.5s ease; }
+        .main-icon { font-size: 12vh; color: var(--primary); margin-bottom: 1vh; text-shadow: 3px 3px 6px rgba(0,0,0,0.15); transition: color 0.5s ease; }
+        .slide-title-main h1 { color: var(--primary); font-size: 4vh; margin-bottom: 1.5vh; text-transform: uppercase; letter-spacing: 4px; font-weight: normal; opacity: 0.9; transition: color 0.5s ease; }
+        .slide-title-main h2 { 
+            font-size: 9vh; font-weight: 900; margin-bottom: 6vh; letter-spacing: 2px; text-transform: uppercase;
+            background: linear-gradient(120deg, var(--accent) 30%, var(--text-main) 50%, var(--accent) 70%);
+            background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            animation: shineText 3.5s linear infinite; filter: drop-shadow(3px 5px 8px rgba(0,0,0,0.2));
+            transition: all 0.5s ease;
+        }
+        @keyframes shineText { 0% { background-position: -200% center; } 100% { background-position: 200% center; } }
+        .slide-title-main .author-info { background: var(--bg-card); color: var(--text-main); padding: 3vh 6vh; border-radius: 12px; border-left: 8px solid var(--primary); border-right: 8px solid var(--accent); box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: left; font-size: 3.5vh; line-height: 1.7; display: inline-block; transition: all 0.5s ease; }
+        .author-info i { color: var(--primary); margin-right: 10px; width: 30px; text-align: center; transition: color 0.5s ease; }
+
+        /* Slide cảnh báo */
+        .warning-slide { background-color: var(--accent-light); border: 0.5vh solid var(--accent); border-radius: 15px; margin: 3vh; padding: 3% 6%; box-shadow: inset 0 0 50px rgba(0,0,0, 0.05); transition: all 0.5s ease; }
+        .warning-slide .slide-header { border-bottom-color: var(--accent); }
+        .warning-slide .slide-header::after { background-color: var(--primary); }
+        .warning-slide .slide-title { color: var(--accent); }
+        .warning-slide .slide-title i { background: var(--accent); color: white; animation: warningFlash 2s infinite; }
+        @keyframes warningFlash { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.8; transform: scale(1.1); } }
+        .warning-slide ul li { color: var(--accent); font-weight: bold; }
+        .warning-slide ul li::before { content: '\f071'; color: var(--accent); font-size: 4.4vh; left: 0.5vh; }
+
+        /* Giao Diện Trắc Nghiệm */
+        .quiz-slide { background: linear-gradient(135deg, var(--primary-light) 0%, var(--bg-slide) 100%); transition: background 0.5s ease; }
+        .quiz-slide::before { content: '\f059'; font-family: "Font Awesome 6 Free"; font-weight: 900; position: absolute; font-size: 50vh; color: rgba(0, 0, 0, 0.03); right: -5vh; bottom: -5vh; z-index: 0; pointer-events: none; transform: rotate(-15deg); }
+        .quiz-container { z-index: 1; position: relative; display: flex; flex-direction: column; justify-content: center; height: 100%; align-items: center; }
+        .quiz-card { background: var(--bg-card); width: 90%; border-radius: 20px; padding: 4vh 5vh; box-shadow: 0 15px 35px rgba(0,0,0,0.1), 0 5px 15px rgba(0,0,0,0.05); border-top: 6px solid var(--primary); position: relative; transition: all 0.5s ease; }
+        .quiz-badge { position: absolute; top: -2.5vh; left: 5vh; background: var(--accent); color: white; padding: 0.8vh 2.5vh; border-radius: 20px; font-size: 2.2vh; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.15); letter-spacing: 1px; text-transform: uppercase; transition: background 0.5s ease; }
+        .quiz-question { font-size: 4.2vh; color: var(--primary); font-weight: bold; margin-bottom: 4vh; line-height: 1.5; text-align: justify; padding-left: 2vh; border-left: 5px solid var(--primary-light); transition: border-color 0.5s ease, color 0.5s ease; }
+        .quiz-options { display: grid; grid-template-columns: 1fr 1fr; gap: 2.5vh; }
+        .quiz-btn { display: flex; align-items: center; background: var(--bg-quiz-btn); border: 2px solid transparent; padding: 1.5vh; border-radius: 15px; font-size: 3.5vh; text-align: left; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); font-family: 'Times New Roman', Times, serif; color: var(--text-main); box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+        .quiz-btn:hover { background: var(--bg-quiz-btn-hover); border-color: var(--primary-border); transform: translateY(-3px); box-shadow: 0 8px 15px rgba(0,0,0,0.08); }
+        .option-letter { display: inline-flex; justify-content: center; align-items: center; width: 5vh; height: 5vh; background: var(--bg-card); border-radius: 10px; font-weight: bold; color: var(--primary); font-size: 3vh; margin-right: 2vh; box-shadow: 0 2px 5px rgba(0,0,0,0.15); flex-shrink: 0; transition: all 0.3s ease; border: 1px solid rgba(0,0,0,0.05); }
+        .option-text { flex: 1; line-height: 1.3; }
+
+        .quiz-btn.correct { background: var(--success-light) !important; border-color: var(--success) !important; color: var(--success) !important; transform: scale(1.02); box-shadow: 0 10px 25px rgba(16, 185, 129, 0.2); animation: pop 0.4s ease; }
+        .quiz-btn.correct .option-letter { background: var(--success); color: white; border-color: var(--success); }
+        .quiz-btn.wrong { background: var(--danger-light) !important; border-color: var(--danger) !important; color: var(--danger) !important; animation: shake 0.4s ease; }
+        .quiz-btn.wrong .option-letter { background: var(--danger); color: white; border-color: var(--danger); }
+        .quiz-btn.reveal-correct { background: var(--success-light) !important; border: 2px dashed var(--success) !important; color: var(--success) !important; opacity: 0.9; }
+        .quiz-btn.reveal-correct .option-letter { background: var(--success); color: white; border-color: var(--success); animation: pulseLetter 1s infinite; }
+
+        @keyframes pop { 50% { transform: scale(1.04); } }
+        @keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-8px);} 75% {transform: translateX(8px);} }
+        @keyframes pulseLetter { 0% { transform: scale(1); } 50% { transform: scale(1.15); box-shadow: 0 0 10px var(--success); } 100% { transform: scale(1); } }
+
+        .quiz-feedback { margin-top: 3vh; opacity: 0; transition: opacity 0.4s; height: 0; overflow: hidden; }
+        .quiz-feedback.show { opacity: 1; height: auto; }
+        .alert { padding: 2vh 3vh; border-radius: 12px; font-size: 3.5vh; font-weight: bold; display: flex; align-items: center; gap: 1.5vh; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .alert-success { background: var(--success-light); color: var(--success); border-left: 6px solid var(--success); }
+        .alert-danger { background: var(--danger-light); color: var(--danger); border-left: 6px solid var(--danger); }
+
+        /* Màn hình CẢM ƠN */
+        .thank-you-slide { justify-content: center; align-items: center; text-align: center; background: radial-gradient(circle, var(--primary-light) 0%, var(--bg-slide) 100%); position: relative; overflow: hidden; transition: background 0.5s ease;}
+        .thank-you-title { color: var(--primary); font-size: 7vh; margin-bottom: 5vh; text-transform: uppercase; text-shadow: 2px 2px 4px rgba(0,0,0,0.15); z-index: 10; position: relative; transition: color 0.5s ease;}
+        .sunflower-container { display: flex; gap: 4vw; justify-content: center; z-index: 10; position: relative; }
+        .sunflower { font-size: 14vh; animation: bloom 3s ease-in-out infinite alternate; transform-origin: bottom center; filter: drop-shadow(0 10px 10px rgba(0,0,0,0.2)); }
+        .sunflower.delay-1 { animation-delay: 0.7s; }
+        .sunflower.delay-2 { animation-delay: 1.4s; }
+        @keyframes bloom { 0% { transform: scale(0.8) rotate(-8deg); } 100% { transform: scale(1.2) rotate(8deg); } }
+        #balloon-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5; overflow: hidden; }
+        .balloon { position: absolute; bottom: -20vh; font-size: 8vh; animation: floatUp linear forwards; filter: drop-shadow(0 5px 5px rgba(0,0,0,0.2)); }
+        .balloon.pop { animation: popBalloon 0.3s ease-out forwards; }
+        @keyframes floatUp { 0% { transform: translateY(0) scale(1); opacity: 1; } 100% { transform: translateY(-120vh) scale(1); opacity: 1; } }
+        @keyframes popBalloon { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.8); opacity: 0.8; } 100% { transform: scale(2); opacity: 0; } }
+
+        /* Footer & Controls */
+        .slide-footer { position: absolute; bottom: 2.5vh; left: 5vh; right: 5vh; display: flex; justify-content: space-between; color: var(--primary); font-size: 2.5vh; font-weight: bold; z-index: 10; transition: color 0.5s ease; align-items: center;}
+        
+        .theme-selector { display: inline-flex; gap: 10px; margin-left: 20px; vertical-align: middle; }
+        .theme-dot { width: 20px; height: 20px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.8); box-shadow: 0 2px 6px rgba(0,0,0,0.3); transition: transform 0.2s; }
+        .theme-dot:hover { transform: scale(1.3); }
+
+        .progress-bar-container { position: absolute; top: 0; left: 0; width: 100%; height: 8px; background: #e5e7eb; z-index: 10; }
+        .progress-bar { height: 100%; background: linear-gradient(90deg, var(--primary), var(--accent)); width: 0%; transition: width 0.4s ease-out, background 0.5s ease; }
+        
+        .controls { position: absolute; bottom: 2.5vh; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; z-index: 100; }
+        
+        /* Giảm kích thước 1/2 nút bấm */
+        .btn-nav { 
+            background: rgba(156, 163, 175, 0.2); 
+            color: var(--primary); 
+            border: 1px solid rgba(156, 163, 175, 0.4); 
+            padding: 6px 15px; 
+            border-radius: 20px; font-size: 14px; 
+            font-weight: bold; font-family: 'Times New Roman', Times, serif; transition: all 0.3s; 
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            display: flex; align-items: center; gap: 5px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); 
+        }
+        .btn-nav:hover { background: rgba(156, 163, 175, 0.4); transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,0,0,0.2); }
+        .btn-nav:disabled { opacity: 0.3; cursor: not-allowed; transform: none; box-shadow: none; background: rgba(156, 163, 175, 0.1); }
+        
+        .notes-btn { position: absolute; bottom: 2.5vh; right: 3.5vh; background: linear-gradient(135deg, #f59e0b, #d97706); color: white; border: 3px solid white; width: 55px; height: 55px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 2.8vh; box-shadow: 0 6px 15px rgba(0,0,0,0.3); z-index: 100; display: none; animation: pulse 2s infinite; }
+        .notes-panel { position: absolute; bottom: 90px; right: 3.5vh; width: 450px; background: var(--bg-card); color: var(--text-main); border-top: 5px solid #f59e0b; padding: 25px; border-radius: 12px; box-shadow: 0 15px 35px rgba(0,0,0,0.25); font-size: 2.5vh; line-height: 1.6; z-index: 100; display: none; backdrop-filter: blur(10px); transition: all 0.5s ease;}
+        
+        /* Cập nhật Các Nút Công Cụ góc trên (Nhỏ lại, trong suốt) */
+        .fullscreen-btn, .download-btn, .toggle-image-btn { 
+            position: absolute; top: 20px; 
+            background: rgba(156, 163, 175, 0.15); /* Mờ trong suốt */
+            color: var(--text-main); 
+            border: 1px solid rgba(156, 163, 175, 0.25); 
+            width: 36px; height: 36px; /* Kích thước nhỏ gọn */
+            border-radius: 10px; display: flex; justify-content: center; align-items: center; 
+            z-index: 100; transition: all 0.2s; backdrop-filter: blur(5px); 
+        }
+        .fullscreen-btn i, .download-btn i, .toggle-image-btn i { font-size: 15px !important; }
+        .btn-num { font-weight: bold; margin-right: 4px; font-family: sans-serif; font-size: 14px; }
+        
+        .fullscreen-btn { right: 20px; }
+        .download-btn { right: 66px; }
+        .toggle-image-btn-1 { right: 112px; display: none; }
+        .toggle-image-btn-2 { right: 158px; display: none; }
+        
+        .download-btn:hover, .fullscreen-btn:hover, .toggle-image-btn:hover { background: var(--accent); border-color: var(--accent); color: white; transform: scale(1.08); }
+
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(245, 158, 11, 0); } 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); } }
+
+        /* IN PDF / EXPORT ẢNH */
+        @media print {
+            @page { size: landscape; margin: 0; }
+            body, html { background: white !important; background-image: none !important; height: auto; overflow: visible !important; color: black !important;}
+            #presentation-container { display: block; height: auto; }
+            .slide-wrapper { box-shadow: none !important; width: 100% !important; height: auto !important; display: block !important; background: white !important; }
+            .slide-wrapper::before, .slide-wrapper::after { display: none !important; }
+            .slide { display: flex !important; page-break-after: always; height: 100vh !important; padding: 4% 6% !important; opacity: 1 !important; transform: none !important; position: relative !important; background: white; }
+            ul li, ul li.visible { opacity: 1 !important; transform: none !important; }
+            .slide-title-main h2 { -webkit-text-fill-color: var(--accent) !important; background: none !important; }
+            .slide-title-main .author-info, .slide-title i, .warning-slide { box-shadow: none !important; border: 2px solid var(--primary-border); }
+            .controls, .notes-btn, .fullscreen-btn, .download-btn, .toggle-image-btn, .progress-bar-container, .notes-panel, #balloon-container, .theme-selector { display: none !important; }
+            .slide-footer { display: none !important; }
+            
+            .quiz-card { border: 2px solid var(--primary-border); box-shadow: none; padding: 2vh; }
+            .quiz-btn { border: 1px solid #ccc; color: black; break-inside: avoid;}
+            .quiz-btn.correct { background: #e0f2f1 !important; border: 2px solid var(--primary) !important; color: black !important;}
         }
     </style>
 </head>
-<body class="bg-gray-100 min-h-screen text-gray-800 font-sans">
+<body>
 
-    <!-- Header -->
-    <header class="bg-white shadow-sm sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <div class="bg-rose-100 text-rose-600 p-2 rounded-full">
-                    <i class="fa-solid fa-stethoscope text-xl"></i>
-                </div>
-                <div>
-                    <h1 class="text-xl font-bold text-gray-900 leading-tight">Phòng Khám Bình Minh</h1>
-                    <p class="text-xs text-gray-500">Công cụ tạo thông báo lịch làm việc</p>
+    <div id="presentation-container">
+        <div class="slide-wrapper" id="capture-area">
+            <div class="progress-bar-container"><div class="progress-bar" id="progress"></div></div>
+            <div class="inner-frame"></div>
+
+            <!-- PHẦN 1: MỞ ĐẦU -->
+            <div class="slide slide-title-main active" data-notes="Chào các em. Khi cầm một tờ kết quả Pap bất thường, thai phụ thường khóc vì sợ ung thư và sợ mất con. Nhiệm vụ của chúng ta là gì? Là phải soi cổ tử cung để loại trừ ung thư mà vẫn giữ an toàn cho thai. Chúng ta cùng bắt đầu nhé!">
+                <i class="fa-solid fa-stethoscope main-icon"></i>
+                <h1>Hướng dẫn thực hành lâm sàng</h1>
+                <h2>Soi cổ tử cung thai kỳ</h2>
+                <div class="author-info">
+                    <strong><i class="fa-solid fa-chalkboard-user"></i> Giảng viên trình bày:</strong><br>
+                    <i class="fa-solid fa-user-doctor"></i> BS. Lê Đàm Vân<br>
+                    <i class="fa-solid fa-hospital"></i> Chuyên khoa 2, BV Từ Dũ
                 </div>
             </div>
-        </div>
-    </header>
 
-    <main class="max-w-7xl mx-auto px-4 py-6 pb-28 sm:pb-8">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
+            <div class="slide">
+                <div class="slide-header"><h2 class="slide-title"><i class="fa-solid fa-book-medical"></i> Mục tiêu - Kiến thức</h2></div>
+                <div class="slide-content"><ul><li>Hiểu sinh lý cổ tử cung.</li><li>Nắm biến đổi tế bào học.</li><li>Nhận diện khó khăn khi soi.</li><li>Phân biệt sinh lý và bệnh.</li><li>Nắm phác đồ theo dõi bệnh.</li></ul></div>
+            </div>
+
+            <div class="slide">
+                <div class="slide-header"><h2 class="slide-title"><i class="fa-solid fa-microscope"></i> Mục tiêu - Kỹ năng</h2></div>
+                <div class="slide-content"><ul><li>Bộc lộ rõ cổ tử cung.</li><li>Lấy sạch chất nhầy an toàn.</li><li>Bấm sinh thiết cầm máu tốt.</li><li>Không nạo kênh cổ tử cung.</li><li>Xử trí đúng tình huống cấp.</li></ul></div>
+            </div>
+
+            <div class="slide">
+                <div class="slide-header"><h2 class="slide-title"><i class="fa-solid fa-hands-holding-child"></i> Mục tiêu - Thái độ</h2></div>
+                <div class="slide-content"><ul><li>Trấn an tâm lý thai phụ.</li><li>Thao tác nhẹ nhàng, cẩn thận.</li><li>Tôn trọng người bệnh tuyệt đối.</li><li>Đảm bảo an toàn thai nhi.</li><li>Tuân thủ quy trình vô khuẩn.</li></ul></div>
+            </div>
+
+            <div class="slide" data-notes="Đây là tình huống có vấn đề thực tế mà các em sẽ gặp rất nhiều ở phòng khám. Thai phụ hoảng loạn, sợ hãi khi cầm kết quả bất thường. Bài toán đặt ra là: Làm sao chẩn đoán được bệnh cho mẹ mà không làm tổn hại đến con? Bài học hôm nay sẽ giúp các em trả lời câu hỏi này.">
+                <div class="slide-header"><h2 class="slide-title"><i class="fa-solid fa-user-injured"></i> Tình huống lâm sàng</h2></div>
+                <div class="split-layout">
+                    <div class="left-content"><ul><li>Thai phụ 28 tuổi, thai 16 tuần.</li><li>Kết quả Pap: HSIL, nguy cơ cao.</li><li>Thai phụ khóc, rất sợ ung thư.</li><li>Lo sợ can thiệp làm sẩy thai.</li><li style="color: var(--accent); font-weight: bold; font-style: italic;">Bác sĩ cần xử trí thế nào?</li></ul></div>
+                    <div class="right-image">
+                        <div class="image-caption-container">
+                            <img src="https://i.ibb.co/Z11TwRcT/edeb9ad47b86.png" alt="Thai phụ lo lắng tại phòng khám">
+                            <div class="image-caption">Thai phụ lo lắng khi nhận kết quả khám bất thường</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PHẦN 2: NỘI DUNG -->
+            <div class="slide" data-notes="Theo các em, thai kỳ có làm ung thư cổ tử cung tiến triển nhanh hơn không? [Chờ 2 giây]. Câu trả lời là KHÔNG. Thai kỳ không làm bệnh nặng thêm!">
+                <div class="slide-header"><h2 class="slide-title"><i class="fa-solid fa-clipboard-list"></i> Đại cương soi thai kỳ</h2></div>
+                <div class="slide-content"><ul><li>Bệnh không tăng khi có thai.</li><li>Thai phụ thường rất lo lắng.</li><li>Mục đích: loại trừ ung thư.</li><li>Tránh can thiệp điều trị sai.</li><li>Tránh nguy cơ sinh non, sẩy.</li></ul></div>
+            </div>
+
+            <div class="slide">
+                <div class="slide-header"><h2 class="slide-title"><i class="fa-solid fa-chart-pie"></i> Dịch tễ học thai kỳ</h2></div>
+                <div class="split-layout">
+                    <div class="left-content"><ul><li>Tỷ lệ bất thường hai phần trăm.</li><li>Đa số là mức độ thấp.</li><li>Ung thư xâm lấn rất hiếm.</li><li>ASCUS, LSIL đều phải soi cổ.</li><li>Khó đọc do cường Estrogen nội.</li></ul></div>
+                    <div class="right-image">
+                        <div class="image-caption-container">
+                            <img src="https://i.ibb.co/r2dZZq1j/3a91a8a64db8.png" alt="Dịch tễ học">
+                            <div class="image-caption">Lộ tuyến và vùng trắng sau acid acetic ở vị trí 9 giờ. Mô học sang thương trong biểu mô mức độ thấp.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide">
+                <div class="slide-header"><h2 class="slide-title"><i class="fa-solid fa-person-pregnant"></i> Sinh lý thai kỳ 1</h2></div>
+                <div class="split-layout">
+                    <div class="left-content"><ul><li>Cường Estrogen khi mang thai.</li><li>Cổ tử cung to và mềm.</li><li>Tăng sinh mạch máu rất nhiều.</li><li>Tiết nhiều chất nhầy đặc dính.</li><li>Phản ứng màng rụng mô đệm.</li></ul></div>
+                    <div class="right-image">
+                        <div class="image-caption-container">
+                            <img src="https://i.ibb.co/CsXS5m4p/a56dcb35608a.png" alt="Sinh lý 1">
+                            <div class="image-caption">Lộ tuyến cổ tử cung, chuyển sản và chất nhầy đặc ở trung tâm.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide">
+                <div class="slide-header"><h2 class="slide-title"><i class="fa-solid fa-dna"></i> Sinh lý thai kỳ 2</h2></div>
+                <div class="split-layout">
+                    <div class="left-content"><ul><li>Tế bào tuyến lộn ra ngoài.</li><li>Lộ tuyến rõ ở người con so.</li><li>Môi trường acid gây chuyển sản.</li><li>Chuyển sản chưa trưởng thành nhiều.</li><li>Rất dễ nhầm với tiền ung thư.</li></ul></div>
+                    <div class="right-image dual-image-container">
+                        <div class="image-caption-container">
+                            <img src="https://i.ibb.co/wr8gXXJJ/9010c48aa177.png" alt="Sinh lý 2A">
+                        </div>
+                        <div class="image-caption-container">
+                            <img src="https://i.ibb.co/4gTnHkD7/02c4349722a9.png" alt="Sinh lý 2B">
+                            <div class="image-caption">Lộ tuyến và chuyển sản cổ tử cung trong 3 tháng đầu thai kỳ.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide" data-notes="Khám phụ khoa cho bà bầu rất khó. Đặt cái mỏ vịt vào là thành âm đạo sa xuống che kín hết. Cổ tử cung thì chạm nhẹ là chảy máu. Vậy ta phải làm sao?">
+                <div class="slide-header"><h2 class="slide-title"><i class="fa-solid fa-magnifying-glass-chart"></i> Khó khăn khi soi</h2></div>
+                <div class="slide-content"><ul><li>Thành âm đạo sa che khuất.</li><li>Chất nhầy đặc dính khó lau.</li><li>Cổ tử cung rất dễ chảy máu.</li><li>Chuyển sản non tạo vết trắng.</li><li>Phản ứng màng rụng giống K.</li></ul></div>
+            </div>
+
+            <div class="slide">
+                <div class="slide-header"><h2 class="slide-title"><i class="fa-solid fa-kit-medical"></i> Kỹ thuật soi chuẩn</h2></div>
+                <div class="split-layout">
+                    <div class="left-content"><ul><li>Dùng mỏ vịt kích cỡ lớn.</li><li>Thao tác phải cực kỳ nhẹ.</li><li>Dùng acid acetic loại chất nhầy.</li><li>Dùng tăm bông chùi rất nhẹ.</li><li>Tránh làm chảy máu tổn thương.</li></ul></div>
+                    <div class="right-image">
+                        <div class="image-caption-container">
+                            <img src="https://i.ibb.co/n8QpMf0x/c7cda7e85a8d.png" alt="Mỏ vịt">
+                            <div class="image-caption">Mỏ vịt âm đạo.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide">
+                <div class="slide-header"><h2 class="slide-title"><i class="fa-regular fa-eye"></i> Nhận diện tổn thương</h2></div>
+                <div class="split-layout">
+                    <div class="left-content"><ul><li>Vết trắng sinh lý thường nhạt.</li><li>Khó phân biệt với LSIL thực.</li><li>HSIL thường có vết trắng đậm.</li><li>Chú ý mạch máu bất thường.</li><li>Lát đá, chấm đáy thô rõ.</li></ul></div>
+                    <div class="right-image">
+                        <div class="image-caption-container">
+                            <img src="https://i.ibb.co/M5yvw1ZT/071135d076da.png" alt="Tổn thương">
+                            <div class="image-caption">Lát đá và mạch máu bất thường HSIL.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide">
+                <div class="slide-header"><h2 class="slide-title"><i class="fa-solid fa-code-branch"></i> Chẩn đoán phân biệt</h2></div>
+                <div class="split-layout">
+                    <div class="left-content"><ul><li>Phân biệt sinh lý và bệnh.</li><li>Phản ứng màng rụng và K.</li><li>Chuyển sản non và LSIL, HSIL.</li><li>Ung thư xâm lấn thường sùi.</li><li>K xâm lấn có mạch máu dị.</li></ul></div>
+                    <div class="right-image dual-image-container">
+                        <div class="image-caption-container">
+                            <img src="https://i.ibb.co/WpdfGPXb/81aa9cd7b5b4.png" alt="PB 1">
+                            <div class="image-caption" style="margin-bottom: 1vh;">Lộn tuyến cổ tử cung, 3 tháng giữa thai kỳ biểu mô trắng... Sinh thiết chỉ thay đổi sinh lý.</div>
+                        </div>
+                        <div class="image-caption-container">
+                            <img src="https://i.ibb.co/hJD0kFZ5/bb0b9d087997.png" alt="PB 2">
+                            <div class="image-caption">Chuyển sản chưa trưởng thành ở phụ nữ có thai.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide warning-slide" data-notes="Slide tiếp theo là mạng sống của thai nhi! Các em lấy bút đỏ gạch dưới cho tôi: Chống chỉ định tuyệt đối nạo kênh cổ tử cung!">
+                <div class="slide-header"><h2 class="slide-title"><i class="fa-solid fa-triangle-exclamation"></i> Chống chỉ định tuyệt đối</h2></div>
+                <div class="split-layout">
+                    <div class="left-content"><ul><li>Cấm nạo kênh cổ tử cung!</li><li>Nguy cơ vỡ ối rất cao.</li><li>Nguy cơ sinh non rất lớn.</li><li>Chảy máu ồ ạt khó cầm.</li><li>Ghi nhớ: Tuyệt đối không nạo!</li></ul></div>
+                    <div class="right-image">
+                        <div class="image-caption-container">
+                            <img src="https://i.ibb.co/GvKwFsjp/34f5544dcc23.png" alt="Nạo kênh" style="border-color: var(--accent);">
+                            <div class="image-caption" style="color: var(--accent);">Dụng cụ nạo kênh cổ tử cung.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide">
+                <div class="slide-header"><h2 class="slide-title"><i class="fa-solid fa-scalpel"></i> Nguyên tắc sinh thiết</h2></div>
+                <div class="split-layout">
+                    <div class="left-content"><ul><li>Chỉ sinh thiết nghi ung thư.</li><li>Không sinh thiết để tìm CIN.</li><li>Bấm đúng vị trí nghi ngờ.</li><li>Dùng kềm nhỏ hạn chế máu.</li><li>Lấy mẫu phải có mô đệm.</li></ul></div>
+                    <div class="right-image">
+                        <div class="image-caption-container">
+                            <img src="https://i.ibb.co/8GVwH1d/b5d20655df6f.png" alt="Kềm">
+                            <div class="image-caption">Các loại kềm sinh thiết.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide">
+                <div class="slide-header"><h2 class="slide-title"><i class="fa-solid fa-droplet"></i> Xử trí chảy máu</h2></div>
+                <div class="split-layout">
+                    <div class="left-content"><ul><li>Cổ tử cung thai kỳ nhiều máu.</li><li>Chuẩn bị sẵn dung dịch Monsel.</li><li>Ép Monsel vào vết bấm ngay.</li><li>Giữ chặt tăm bông nửa phút.</li><li>Đảm bảo cầm máu hoàn toàn.</li></ul></div>
+                    <div class="right-image">
+                        <div class="image-caption-container">
+                            <img src="https://i.ibb.co/G47MLytS/4b78f408dc9f.png" alt="Monsel">
+                            <div class="image-caption">Dung dịch Monsel.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide">
+                <div class="slide-header"><h2 class="slide-title"><i class="fa-solid fa-file-medical"></i> Quản lý tổn thương CIN</h2></div>
+                <div class="split-layout">
+                    <div class="left-content"><ul><li>CIN một, hai, ba: Theo dõi.</li><li>Không khoét chóp trong thai kỳ.</li><li>Tỷ lệ tự khỏi sau sinh cao.</li><li>Bệnh không ảnh hưởng thai nhi.</li><li>Vẫn cho phép sinh ngả âm đạo.</li></ul></div>
+                    <div class="right-image">
+                        <div class="image-caption-container">
+                            <img src="https://i.ibb.co/XkkcbQwX/59cc93256fde.png" alt="CIN">
+                            <div class="image-caption">Vùng trắng sau acid acetic và lát đá. Mô học tổn thương trong biểu mô mức độ cao.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide">
+                <div class="slide-header"><h2 class="slide-title"><i class="fa-solid fa-ribbon"></i> Quản lý nghi ung thư</h2></div>
+                <div class="split-layout">
+                    <div class="left-content"><ul><li>Khối u sùi, loét: Bấm ngay.</li><li>Chuyển tuyến chuyên khoa ung bướu.</li><li>Cân nhắc mổ lấy thai sau đó.</li><li>Điều trị ung thư sau lấy thai.</li><li>Cá thể hóa theo tuổi thai.</li></ul></div>
+                    <div class="right-image">
+                        <div class="image-caption-container">
+                            <img src="https://i.ibb.co/KzbhtBWy/d9ea0e39ab4d.png" alt="K">
+                            <div class="image-caption">Thai phụ có thai 20 tuần. Tế bào CTC bất thường nghi ngờ ung thư xâm lấn.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide">
+                <div class="slide-header"><h2 class="slide-title"><i class="fa-solid fa-baby"></i> Theo dõi hậu sản</h2></div>
+                <div class="split-layout">
+                    <div class="left-content"><ul><li>Cổ tử cung phục hồi sau sinh.</li><li>Đánh giá lại mười hai tuần.</li><li>Làm lại tế bào học, soi cổ.</li><li>Có thể khoét chóp lúc này.</li><li>HSIL hiếm khi tự khỏi bệnh.</li></ul></div>
+                    <div class="right-image">
+                        <div class="image-caption-container">
+                            <img src="https://i.ibb.co/cScbkkxL/ab876554c9ee.png" alt="Hậu sản">
+                            <div class="image-caption">Cổ tử cung bình thường thấy rõ vùng tiếp nối lát-trụ.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PHẦN 3: TRẮC NGHIỆM ÔN TẬP -->
+            <div class="slide quiz-slide" data-notes="Mời các em cùng ôn lại bài bằng 10 câu trắc nghiệm nhanh nhé. Ai xung phong trả lời câu đầu tiên?">
+                <div class="slide-header"><h2 class="slide-title"><i class="fa-solid fa-chalkboard-user"></i> Trắc nghiệm Lâm sàng</h2></div>
+                <div class="quiz-container">
+                    <div class="quiz-card">
+                        <div class="quiz-badge">Câu 1 / 10</div>
+                        <div class="quiz-question">Tần suất phát hiện bất thường trên tế bào học cổ tử cung trong giai đoạn mang thai khoảng bao nhiêu?</div>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkAnswer(this, true, 'A')"><span class="option-letter">A</span><span class="option-text">1,26 - 2,2%</span></button>
+                            <button class="quiz-btn" onclick="checkAnswer(this, false, 'B')"><span class="option-letter">B</span><span class="option-text">5 - 10%</span></button>
+                            <button class="quiz-btn" onclick="checkAnswer(this, false, 'C')"><span class="option-letter">C</span><span class="option-text">15 - 20%</span></button>
+                            <button class="quiz-btn" onclick="checkAnswer(this, false, 'D')"><span class="option-letter">D</span><span class="option-text">Trên 30%</span></button>
+                        </div>
+                        <div class="quiz-feedback"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide quiz-slide">
+                <div class="slide-header"><h2 class="slide-title"><i class="fa-solid fa-chalkboard-user"></i> Trắc nghiệm Lâm sàng</h2></div>
+                <div class="quiz-container">
+                    <div class="quiz-card">
+                        <div class="quiz-badge">Câu 2 / 10</div>
+                        <div class="quiz-question">Những thay đổi sinh lý ở cổ tử cung khi mang thai (to ra, tăng sinh mạch máu, tăng tiết nhầy) chủ yếu là do tình trạng cường nội tiết tố nào?</div>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkAnswer(this, false, 'A')"><span class="option-letter">A</span><span class="option-text">Progesteron</span></button>
+                            <button class="quiz-btn" onclick="checkAnswer(this, true, 'B')"><span class="option-letter">B</span><span class="option-text">Estrogen</span></button>
+                            <button class="quiz-btn" onclick="checkAnswer(this, false, 'C')"><span class="option-letter">C</span><span class="option-text">Prolactin</span></button>
+                            <button class="quiz-btn" onclick="checkAnswer(this, false, 'D')"><span class="option-letter">D</span><span class="option-text">Oxytocin</span></button>
+                        </div>
+                        <div class="quiz-feedback"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide quiz-slide">
+                <div class="slide-header"><h2 class="slide-title"><i class="fa-solid fa-chalkboard-user"></i> Trắc nghiệm Lâm sàng</h2></div>
+                <div class="quiz-container">
+                    <div class="quiz-card">
+                        <div class="quiz-badge">Câu 3 / 10</div>
+                        <div class="quiz-question">Đặc điểm nào sau đây KHÔNG PHẢI là thay đổi sinh lý bình thường của cổ tử cung trong thai kỳ?</div>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkAnswer(this, false, 'A')"><span class="option-letter">A</span><span class="option-text">Tăng sinh mạch máu phong phú</span></button>
+                            <button class="quiz-btn" onclick="checkAnswer(this, false, 'B')"><span class="option-letter">B</span><span class="option-text">Cổ tử cung mềm và to ra</span></button>
+                            <button class="quiz-btn" onclick="checkAnswer(this, true, 'C')"><span class="option-letter">C</span><span class="option-text">Giảm tiết chất nhầy âm đạo</span></button>
+                            <button class="quiz-btn" onclick="checkAnswer(this, false, 'D')"><span class="option-letter">D</span><span class="option-text">Tế bào tuyến lộn ra ngoài</span></button>
+                        </div>
+                        <div class="quiz-feedback"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide quiz-slide">
+                <div class="slide-header"><h2 class="slide-title"><i class="fa-solid fa-chalkboard-user"></i> Trắc nghiệm Lâm sàng</h2></div>
+                <div class="quiz-container">
+                    <div class="quiz-card">
+                        <div class="quiz-badge">Câu 4 / 10</div>
+                        <div class="quiz-question">Mục đích chính của việc soi cổ tử cung khi phát hiện tế bào học bất thường ở phụ nữ có thai là gì?</div>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkAnswer(this, false, 'A')"><span class="option-letter">A</span><span class="option-text">Điều trị dứt điểm tổn thương CIN 1</span></button>
+                            <button class="quiz-btn" onclick="checkAnswer(this, true, 'B')"><span class="option-letter">B</span><span class="option-text">Loại trừ K xâm lấn, tránh can thiệp sai</span></button>
+                            <button class="quiz-btn" onclick="checkAnswer(this, false, 'C')"><span class="option-letter">C</span><span class="option-text">Nạo kênh cổ tử cung để chẩn đoán</span></button>
+                            <button class="quiz-btn" onclick="checkAnswer(this, false, 'D')"><span class="option-letter">D</span><span class="option-text">Khoét chóp dự phòng viêm nhiễm</span></button>
+                        </div>
+                        <div class="quiz-feedback"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide quiz-slide">
+                <div class="slide-header"><h2 class="slide-title"><i class="fa-solid fa-chalkboard-user"></i> Trắc nghiệm Lâm sàng</h2></div>
+                <div class="quiz-container">
+                    <div class="quiz-card" style="border-top-color: var(--accent);">
+                        <div class="quiz-badge" style="background: var(--accent);">Câu 5 / 10</div>
+                        <div class="quiz-question" style="color: var(--accent);">Thủ thuật nào bị CHỐNG CHỈ ĐỊNH TUYỆT ĐỐI khi soi cổ tử cung ở thai phụ?</div>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkAnswer(this, false, 'A')"><span class="option-letter">A</span><span class="option-text">Bôi dung dịch acid acetic</span></button>
+                            <button class="quiz-btn" onclick="checkAnswer(this, false, 'B')"><span class="option-letter">B</span><span class="option-text">Bấm sinh thiết bằng kềm nhỏ</span></button>
+                            <button class="quiz-btn" onclick="checkAnswer(this, false, 'C')"><span class="option-letter">C</span><span class="option-text">Bôi dung dịch Monsel cầm máu</span></button>
+                            <button class="quiz-btn" onclick="checkAnswer(this, true, 'D')"><span class="option-letter">D</span><span class="option-text">Nạo kênh cổ tử cung</span></button>
+                        </div>
+                        <div class="quiz-feedback"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide quiz-slide">
+                <div class="slide-header"><h2 class="slide-title"><i class="fa-solid fa-chalkboard-user"></i> Trắc nghiệm Lâm sàng</h2></div>
+                <div class="quiz-container">
+                    <div class="quiz-card">
+                        <div class="quiz-badge">Câu 6 / 10</div>
+                        <div class="quiz-question">Lý do chống chỉ định nạo kênh cổ tử cung trong thai kỳ là gì?</div>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkAnswer(this, false, 'A')"><span class="option-letter">A</span><span class="option-text">Nguy cơ vỡ màng ối trước chuyển dạ</span></button>
+                            <button class="quiz-btn" onclick="checkAnswer(this, false, 'B')"><span class="option-letter">B</span><span class="option-text">Nguy cơ sanh non</span></button>
+                            <button class="quiz-btn" onclick="checkAnswer(this, false, 'C')"><span class="option-letter">C</span><span class="option-text">Xuất huyết ồ ạt không cầm được</span></button>
+                            <button class="quiz-btn" onclick="checkAnswer(this, true, 'D')"><span class="option-letter">D</span><span class="option-text">Tất cả các ý trên đều đúng</span></button>
+                        </div>
+                        <div class="quiz-feedback"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide quiz-slide">
+                <div class="slide-header"><h2 class="slide-title"><i class="fa-solid fa-chalkboard-user"></i> Trắc nghiệm Lâm sàng</h2></div>
+                <div class="quiz-container">
+                    <div class="quiz-card">
+                        <div class="quiz-badge">Câu 7 / 10</div>
+                        <div class="quiz-question">Hướng xử trí đúng đắn nhất đối với tổn thương tiền ung thư (CIN) phát hiện trong thai kỳ là gì?</div>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkAnswer(this, false, 'A')"><span class="option-letter">A</span><span class="option-text">Khoét chóp cổ tử cung ngay lập tức</span></button>
+                            <button class="quiz-btn" onclick="checkAnswer(this, false, 'B')"><span class="option-letter">B</span><span class="option-text">Phẫu thuật cắt tử cung nguyên khối</span></button>
+                            <button class="quiz-btn" onclick="checkAnswer(this, true, 'C')"><span class="option-letter">C</span><span class="option-text">Theo dõi thai thường kỳ, đánh giá sau sinh</span></button>
+                            <button class="quiz-btn" onclick="checkAnswer(this, false, 'D')"><span class="option-letter">D</span><span class="option-text">Chấm dứt thai kỳ để điều trị mẹ</span></button>
+                        </div>
+                        <div class="quiz-feedback"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide quiz-slide">
+                <div class="slide-header"><h2 class="slide-title"><i class="fa-solid fa-chalkboard-user"></i> Trắc nghiệm Lâm sàng</h2></div>
+                <div class="quiz-container">
+                    <div class="quiz-card">
+                        <div class="quiz-badge">Câu 8 / 10</div>
+                        <div class="quiz-question">Tổn thương tiền ung thư (CIN) trong thai kỳ có ảnh hưởng đến phương pháp sinh của sản phụ không?</div>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkAnswer(this, false, 'A')"><span class="option-letter">A</span><span class="option-text">Bắt buộc phải mổ lấy thai chủ động</span></button>
+                            <button class="quiz-btn" onclick="checkAnswer(this, true, 'B')"><span class="option-letter">B</span><span class="option-text">Vẫn có thể sinh thường ngả âm đạo</span></button>
+                            <button class="quiz-btn" onclick="checkAnswer(this, false, 'C')"><span class="option-letter">C</span><span class="option-text">Luôn gây sinh non nên cần mổ sớm</span></button>
+                            <button class="quiz-btn" onclick="checkAnswer(this, false, 'D')"><span class="option-letter">D</span><span class="option-text">Sẽ gây băng huyết sau sinh tự nhiên</span></button>
+                        </div>
+                        <div class="quiz-feedback"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide quiz-slide">
+                <div class="slide-header"><h2 class="slide-title"><i class="fa-solid fa-chalkboard-user"></i> Trắc nghiệm Lâm sàng</h2></div>
+                <div class="quiz-container">
+                    <div class="quiz-card">
+                        <div class="quiz-badge">Câu 9 / 10</div>
+                        <div class="quiz-question">Thời điểm nào là tốt nhất để tiến hành đánh giá lại (tế bào học và soi cổ) tổn thương CIN sau sinh?</div>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkAnswer(this, false, 'A')"><span class="option-letter">A</span><span class="option-text">Ngay trong ngày đầu sau sinh</span></button>
+                            <button class="quiz-btn" onclick="checkAnswer(this, false, 'B')"><span class="option-letter">B</span><span class="option-text">2 đến 4 tuần sau sinh</span></button>
+                            <button class="quiz-btn" onclick="checkAnswer(this, true, 'C')"><span class="option-letter">C</span><span class="option-text">8 đến 12 tuần sau sinh</span></button>
+                            <button class="quiz-btn" onclick="checkAnswer(this, false, 'D')"><span class="option-letter">D</span><span class="option-text">6 tháng sau sinh</span></button>
+                        </div>
+                        <div class="quiz-feedback"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide quiz-slide">
+                <div class="slide-header"><h2 class="slide-title"><i class="fa-solid fa-chalkboard-user"></i> Trắc nghiệm Lâm sàng</h2></div>
+                <div class="quiz-container">
+                    <div class="quiz-card">
+                        <div class="quiz-badge">Câu 10 / 10</div>
+                        <div class="quiz-question">Tiên lượng đối với tổn thương CIN sau khi sinh được đánh giá như thế nào?</div>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkAnswer(this, true, 'A')"><span class="option-letter">A</span><span class="option-text">Tỷ lệ tự thoái triển (tự khỏi) rất cao</span></button>
+                            <button class="quiz-btn" onclick="checkAnswer(this, false, 'B')"><span class="option-letter">B</span><span class="option-text">Bệnh diễn tiến cực nhanh thành ung thư</span></button>
+                            <button class="quiz-btn" onclick="checkAnswer(this, false, 'C')"><span class="option-letter">C</span><span class="option-text">Thai nghén làm tiên lượng tồi tệ hơn</span></button>
+                            <button class="quiz-btn" onclick="checkAnswer(this, false, 'D')"><span class="option-letter">D</span><span class="option-text">Không thể tự khỏi, bắt buộc xạ trị</span></button>
+                        </div>
+                        <div class="quiz-feedback"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PHẦN 4: ĐÁNH GIÁ & TÀI LIỆU -->
+            <div class="slide">
+                <div class="slide-header"><h2 class="slide-title"><i class="fa-solid fa-clipboard-check"></i> Đánh giá học viên</h2></div>
+                <div class="slide-content"><ul><li>Hình thức: Thi chạy trạm OSCE.</li><li>Công cụ: Bảng kiểm lâm sàng.</li><li>Kỹ năng chọn mỏ vịt to.</li><li>Nhận diện chống chỉ định nạo.</li><li>Xử lý tình huống chảy máu.</li></ul></div>
+            </div>
+
+            <div class="slide">
+                <div class="slide-header"><h2 class="slide-title"><i class="fa-solid fa-list-check"></i> Bảng kiểm thực hành</h2></div>
+                <div class="split-layout">
+                    <div class="left-content"><ul><li>Bước 1: Tư vấn thai phụ tốt.</li><li>Bước 2: Bộc lộ không chảy máu.</li><li>Bước 3: Lấy sạch nhầy nhẹ nhàng.</li><li>Bước 4: Cầm máu bằng Monsel đúng.</li><li>Bước 5: Không đưa kềm vào kênh.</li></ul></div>
+                    <div class="right-image">
+                        <div class="image-caption-container">
+                            <img src="https://i.ibb.co/C5nrzKKM/1bcd5e8c33e3.png" alt="Khay dụng cụ">
+                            <div class="image-caption">Khay dụng cụ Soi cổ tử cung.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SLIDE TÀI LIỆU THAM KHẢO -->
+            <div class="slide">
+                <div class="slide-header"><h2 class="slide-title"><i class="fa-solid fa-book-bookmark"></i> Tài liệu tham khảo</h2></div>
+                <div class="slide-content">
+                    <ul class="ref-list">
+                        <li><strong>Phác đồ Bệnh viện Từ Dũ:</strong> Phác đồ bệnh viện Từ Dũ năm 2025.</li>
+                        <li><strong>Tài liệu Soi cổ tử cung:</strong> Tài liệu đào tạo liên tục Soi cổ tử cung (Lưu hành nội bộ), Bệnh viện Từ Dũ, TP. Hồ Chí Minh, 01/2020; Barbara S. Apger MD, MS, David G. Weismiller (2008), “Colposcopy Principles and Practice”, An intergrated Text book and Atlas - 2nd Edition - Chapter 21 - pp411-19.</li>
+                        <li><strong>Hướng dẫn của Bộ Y tế:</strong> Hướng dẫn dự phòng và kiểm soát ung thư cổ tử cung, Bộ Y tế ban hành năm 2017; Hướng dẫn sàng lọc, điều trị tổn thương tiền ung thư để dự phòng thứ cấp ung thư cổ tử cung, Hà Nội, tháng 5-2011.</li>
+                        <li><strong>Tiêu chuẩn Bethesda 2014:</strong> Ritu Nayar, David C. Wilbur (eds.) - The Bethesda System for Reporting Cervical Cytology: Definitions, Criteria, and Explanatory Notes - Springer International Publishing, 2015.</li>
+                        <li><strong>Tổ chức Y tế Thế giới:</strong> World Health Organization. Comprehensive cervical cancer control: a guide to essential practice - 2nd ed, Geneva, 2014.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- MÀN HÌNH CẢM ƠN -->
+            <div class="slide thank-you-slide" data-notes="Bài giảng của chúng ta hôm nay đến đây là kết thúc. Cảm ơn các em đã tích cực tham gia tương tác. Chúc các em sẽ luôn tự tin và vững vàng khi thực hành lâm sàng!">
+                <div class="thank-you-content">
+                    <h1 class="thank-you-title">CẢM ƠN CÁC EM ĐÃ THEO DÕI BÀI HỌC!</h1>
+                    <div class="sunflower-container">
+                        <span class="sunflower">🌻</span>
+                        <span class="sunflower delay-1">🌻</span>
+                        <span class="sunflower delay-2">🌻</span>
+                        <span class="sunflower delay-1">🌻</span>
+                        <span class="sunflower">🌻</span>
+                    </div>
+                </div>
+                <div id="balloon-container"></div>
+            </div>
+
+            <!-- Footer & Controls -->
+            <div class="slide-footer">
+                <span id="footer-course">
+                    <i class="fa-solid fa-user-doctor" style="margin-right: 8px;"></i>BS.CK2 - Lê Đàm Vân
+                    <!-- Nút Chọn Theme -->
+                    <div class="theme-selector">
+                        <span class="theme-dot" onclick="setTheme('theme-default')" style="background: #006064;" title="Teal - Rose (Mặc định)"></span>
+                        <span class="theme-dot" onclick="setTheme('theme-blue')" style="background: #1e3a8a;" title="Blue - Orange"></span>
+                        <span class="theme-dot" onclick="setTheme('theme-green')" style="background: #064e3b;" title="Green - Purple"></span>
+                        <span class="theme-dot" onclick="setTheme('theme-dark')" style="background: #111827; border-color: #9ca3af;" title="Dark Mode (Ban đêm)"></span>
+                    </div>
+                </span>
+                <span id="footer-right">
+                    <span id="footer-date"></span> &nbsp;|&nbsp; <span id="footer-page"></span>
+                </span>
+            </div>
             
-            <!-- CỘT TRÁI: ĐIỀU KHIỂN & NHẬP LIỆU -->
-            <div class="lg:col-span-5 space-y-4 order-2 lg:order-1">
-                
-                <!-- Bảng chọn thời gian -->
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                    <button onclick="toggleSection('time-section')" class="w-full p-4 sm:p-5 text-left flex items-center justify-between focus:outline-none hover:bg-gray-50 transition-colors">
-                        <h2 class="text-lg font-bold flex items-center gap-2">
-                            <i class="fa-regular fa-calendar text-green-500"></i> Thời gian áp dụng
-                        </h2>
-                        <i id="time-section-icon" class="fa-solid fa-chevron-up text-gray-400"></i>
-                    </button>
-                    <div id="time-section" class="px-4 sm:px-5 pb-4 sm:pb-5 block border-t border-gray-100 pt-3">
-                        <div class="flex flex-col sm:flex-row items-center gap-3 sm:gap-4">
-                            <div class="w-full sm:flex-1">
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Từ ngày</label>
-                                <input type="date" id="date-from" onchange="updateDateRange()" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-blue-500 focus:border-blue-500 outline-none shadow-sm bg-white h-[44px]">
-                            </div>
-                            <div class="w-full sm:flex-1">
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Đến ngày</label>
-                                <input type="date" id="date-to" onchange="updateDateRange()" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-blue-500 focus:border-blue-500 outline-none shadow-sm bg-white h-[44px]">
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <button id="btn-notes" class="notes-btn" title="Lời giảng"><i class="fa-solid fa-comment-medical"></i></button>
+            <div id="panel-notes" class="notes-panel"></div>
+            
+            <!-- Nút Công cụ nổi (Thu nhỏ & Trong suốt) -->
+            <button id="btn-toggle-image-2" class="toggle-image-btn toggle-image-btn-2" title="Phóng to/Thu nhỏ ảnh 2 (Phím 2)"><span class="btn-num">2</span><i class="fa-solid fa-magnifying-glass-plus"></i></button>
+            <button id="btn-toggle-image-1" class="toggle-image-btn toggle-image-btn-1" title="Phóng to/Thu nhỏ ảnh 1 (Phím 1)"><span class="btn-num" id="span-num-1">1</span><i class="fa-solid fa-magnifying-glass-plus"></i></button>
+            <button id="btn-download" class="download-btn" title="Tải Slide thành Ảnh (Image)"><i class="fa-solid fa-image"></i></button>
+            <button id="btn-fullscreen" class="fullscreen-btn" title="Toàn màn hình"><i class="fa-solid fa-expand"></i></button>
 
-                <!-- Bảng chọn lịch -->
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                    <button onclick="toggleSection('schedule-section')" class="w-full p-4 sm:p-5 text-left flex items-center justify-between focus:outline-none hover:bg-gray-50 transition-colors">
-                        <h2 class="text-lg font-bold flex items-center gap-2">
-                            <i class="fa-regular fa-calendar-check text-blue-500"></i> Cài đặt lịch tuần này
-                        </h2>
-                        <i id="schedule-section-icon" class="fa-solid fa-chevron-down text-gray-400"></i>
-                    </button>
-                    <div id="schedule-section" class="px-4 sm:px-5 pb-4 sm:pb-5 hidden border-t border-gray-100 pt-3">
-                        <p class="text-[11px] text-gray-500 mb-3 italic">* Nhấp vào biểu tượng bên cạnh ngày để đổi Icon</p>
-                        
-                        <div id="schedule-controls" class="space-y-3">
-                            <!-- JS sẽ render các tuỳ chọn vào đây -->
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Bảng chọn giao diện -->
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                    <button onclick="toggleSection('theme-section')" class="w-full p-4 sm:p-5 text-left flex items-center justify-between focus:outline-none hover:bg-gray-50 transition-colors">
-                        <h2 class="text-lg font-bold flex items-center gap-2">
-                            <i class="fa-solid fa-palette text-purple-500"></i> Chọn chủ đề (Theme)
-                        </h2>
-                        <i id="theme-section-icon" class="fa-solid fa-chevron-down text-gray-400"></i>
-                    </button>
-                    <div id="theme-section" class="px-4 sm:px-5 pb-4 sm:pb-5 hidden border-t border-gray-100 pt-3">
-                        <div id="theme-controls" class="flex overflow-x-auto gap-3 pb-2 snap-x no-scrollbar items-start">
-                            <!-- JS sẽ render themes vào đây -->
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
-            <!-- CỘT PHẢI: XEM TRƯỚC VÀ XUẤT ẢNH -->
-            <div class="lg:col-span-7 relative order-1 lg:order-2">
-                <!-- Wrapper Sticky để ảnh luôn hiển thị 100% khi cuộn chuột trên máy tính -->
-                <div class="lg:sticky lg:top-[88px] flex flex-col items-center">
-                    
-                    <!-- Thanh công cụ hành động (Đã ghim dưới đáy màn hình trên mobile) -->
-                    <div class="fixed bottom-0 left-0 w-full bg-white/95 backdrop-blur-md p-4 border-t border-gray-200 z-50 flex gap-3 justify-center shadow-[0_-10px_20px_-5px_rgba(0,0,0,0.1)] sm:static sm:bg-transparent sm:backdrop-blur-none sm:p-0 sm:border-t-0 sm:mb-4 sm:w-full sm:max-w-[440px] sm:shadow-none">
-                        <button onclick="saveImage()" class="flex-1 max-w-[220px] bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg transition duration-200 flex items-center justify-center gap-2 active:scale-95">
-                            <i class="fa-solid fa-download"></i> Lưu Ảnh HD 2K
-                        </button>
-                        <button onclick="shareImage()" class="flex-1 max-w-[220px] bg-green-600 hover:bg-green-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg transition duration-200 flex items-center justify-center gap-2 active:scale-95">
-                            <i class="fa-solid fa-share-nodes"></i> Chia Sẻ
-                        </button>
-                    </div>
-
-                    <!-- Khung Xem Trước (Preview) có thanh trượt ngang -->
-                    <div class="w-full overflow-x-auto no-scrollbar bg-gray-200 rounded-lg p-4 relative shadow-inner">
-                        <div class="w-fit mx-auto">
-                            <div id="preview-wrapper" class="overflow-hidden">
-                                <!-- element thực sự sẽ bị render thành ảnh -->
-                                <div id="preview-card" class="bg-white p-5 rounded-2xl shadow-2xl relative transition-all duration-500 overflow-hidden">
-                                    
-                                    <!-- Theme Decorators (Shapes/Lines) -->
-                                    <div id="theme-decorator" class="absolute top-0 left-0 w-full h-2 z-30"></div>
-
-                                    <!-- Viền bên trong (Inner Border) -->
-                                    <div id="theme-inner-border" class="absolute inset-1.5 z-20 pointer-events-none rounded-xl"></div>
-
-                                    <!-- Lớp Hoa Văn Nền (Pattern) -->
-                                    <div id="theme-pattern" class="absolute inset-0 z-0 pointer-events-none transition-all duration-500"></div>
-                                    
-                                    <!-- Biểu tượng in chìm (Watermark) -->
-                                    <div id="theme-watermark" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[180px] opacity-[0.04] pointer-events-none z-0 transition-all duration-500 flex justify-center items-center">
-                                        <i class="fa-solid fa-stethoscope"></i>
-                                    </div>
-
-                                    <div class="relative z-30 flex flex-col min-h-full">
-                                        <!-- Header Thông Báo (Ngang) -->
-                                        <div class="mb-4 pt-3 flex flex-row items-center gap-4 w-full px-1">
-                                            <div id="preview-icon" class="shrink-0">
-                                                <!-- Logo bên trái -->
-                                                <img id="clinic-logo" src="https://i.ibb.co/RTVKhSqC/1938fb385874.jpg" alt="Logo Phòng Khám" crossorigin="anonymous" class="w-[100px] h-[100px] rounded-[22px] bg-white p-1.5 object-contain border-2 shadow-[0_4px_15px_-3px_rgba(0,0,0,0.1)]">
-                                            </div>
-                                            <div class="flex-1 flex flex-col justify-center text-left">
-                                                <h2 class="text-[11px] font-bold tracking-[0.1em] uppercase mb-0.5 opacity-90 leading-tight" id="preview-clinic-name">Phòng Khám Sản Phụ Khoa</h2>
-                                                <h3 class="text-[26px] font-black uppercase tracking-widest drop-shadow-sm mb-2 leading-none" id="preview-clinic-brand">BÌNH MINH</h3>
-                                                
-                                                <h1 class="text-[28px] font-black uppercase tracking-widest mb-1 leading-none drop-shadow-md">Thông Báo</h1>
-                                                <p class="text-[13px] font-bold uppercase tracking-wider mb-0.5 leading-tight">Lịch Làm Việc Trong Tuần</p>
-                                                <p id="preview-date-range" class="text-[12px] font-medium opacity-90 italic"></p>
-                                            </div>
-                                        </div>
-
-                                        <!-- Lịch Render -->
-                                        <div class="backdrop-blur-md rounded-xl p-3 shadow-sm border flex-1" id="preview-schedule-box">
-                                            <div id="preview-schedule-list" class="space-y-0.5 font-medium text-[14px]">
-                                                <!-- Lịch được render bởi JS -->
-                                            </div>
-                                        </div>
-
-                                        <!-- Footer Thông Tin Bác Sĩ & QR Code -->
-                                        <div class="mt-4 pt-4 border-t border-dashed flex flex-row items-center justify-between gap-3">
-                                            
-                                            <div id="preview-doctor-box" class="flex-1 rounded-xl py-2 px-2 shadow-sm flex flex-col items-center border border-white/40">
-                                                <h3 class="text-[15px] font-black uppercase mb-1.5 leading-tight drop-shadow-sm text-center">BS. CKII LÊ ĐÀM VÂN<br><span class="text-[12px] font-bold opacity-90">Bệnh Viện Từ Dũ</span></h3>
-                                                <div id="preview-phone-box" class="inline-flex items-center justify-center gap-2 font-bold text-[15px] px-4 py-1.5 rounded-full shadow-md">
-                                                    <i class="fa-solid fa-phone-volume animate-bounce"></i>
-                                                    <span>0906 404 312</span>
-                                                </div>
-                                            </div>
-
-                                            <div class="flex flex-col items-center justify-center bg-white p-2 rounded-xl shadow-sm border border-gray-200 shrink-0">
-                                                <div id="qrcode" class="w-[64px] h-[64px]"></div>
-                                                <p class="text-[9px] font-bold mt-1 text-center text-gray-700 uppercase">Bản đồ</p>
-                                            </div>
-                                        </div>
-
-                                        <!-- Lời chào chốt nằm trên đường viền -->
-                                        <div class="text-center mt-4 flex flex-col gap-1.5 pb-0.5">
-                                            <p class="text-[11px] italic font-medium opacity-85 drop-shadow-sm">Rất hân hạnh được phục vụ và chăm sóc sức khỏe cho bạn.</p>
-                                            <p class="text-[14px] font-bold uppercase tracking-wide drop-shadow-sm">Xin trân trọng thông báo đến Quý khách!</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
         </div>
-    </main>
 
-    <!-- Modal trạng thái (Loading...) -->
-    <div id="loading-modal" class="fixed inset-0 bg-black/60 z-[100] hidden items-center justify-center backdrop-blur-sm">
-        <div class="bg-white p-6 rounded-2xl shadow-xl text-center flex flex-col items-center">
-            <i class="fa-solid fa-spinner fa-spin text-4xl text-blue-600 mb-4"></i>
-            <h3 class="text-lg font-bold text-gray-800">Đang xuất ảnh 2K siêu nét...</h3>
-            <p class="text-sm text-gray-500">Vui lòng chờ giây lát</p>
+        <div class="controls">
+            <button class="btn-nav" id="btn-prev"><i class="fa-solid fa-arrow-left"></i> Trước</button>
+            <button class="btn-nav" id="btn-next">Tiếp <i class="fa-solid fa-arrow-right"></i></button>
         </div>
     </div>
 
     <script>
-        // --- DANH SÁCH 10 ICON SINH ĐỘNG ---
-        const dayIcons = [
-            { icon: 'fa-calendar-check', color: 'text-green-600' }, // Mặc định xanh lá
-            { icon: 'fa-sun', color: 'text-amber-500' },          // Nắng
-            { icon: 'fa-star', color: 'text-yellow-400' },        // Sao
-            { icon: 'fa-heart', color: 'text-rose-500' },         // Tim
-            { icon: 'fa-leaf', color: 'text-emerald-500' },       // Lá
-            { icon: 'fa-clover', color: 'text-teal-500' },        // Cỏ 4 lá
-            { icon: 'fa-clock', color: 'text-indigo-500' },       // Đồng hồ
-            { icon: 'fa-bell', color: 'text-purple-500' },        // Chuông báo
-            { icon: 'fa-stethoscope', color: 'text-cyan-500' },   // Ống nghe
-            { icon: 'fa-user-doctor', color: 'text-blue-500' }    // Bác sĩ
-        ];
+        // Cài đặt ngày tháng năm động
+        function setFooterDate() {
+            const today = new Date();
+            const dateStr = today.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            document.getElementById('footer-date').innerText = dateStr;
+        }
+        setFooterDate();
 
-        // --- DATA LỊCH LÀM VIỆC ---
-        const schedules = [
-            { id: 't2', day: 'Thứ 2', time: '17:30 - 21:00', status: 'work', note: '', isExpanded: false, iconIndex: 0 },
-            { id: 't3', day: 'Thứ 3', time: '17:30 - 21:00', status: 'work', note: '', isExpanded: false, iconIndex: 0 },
-            { id: 't4', day: 'Thứ 4', time: '17:30 - 21:00', status: 'work', note: '', isExpanded: false, iconIndex: 0 },
-            { id: 't5', day: 'Thứ 5', time: '17:30 - 21:00', status: 'work', note: '', isExpanded: false, iconIndex: 0 },
-            { id: 't6', day: 'Thứ 6', time: '17:30 - 21:00', status: 'work', note: '', isExpanded: false, iconIndex: 0 },
-            { id: 't7s', day: 'Thứ 7 (Sáng)', time: '07:00 - 11:00', status: 'work', note: '', isExpanded: false, iconIndex: 0 }, 
-            { id: 't7c', day: 'Thứ 7 (Chiều)', time: '17:30 - 21:00', status: 'work', note: '', isExpanded: false, iconIndex: 0 }, 
-            { id: 'cns', day: 'Chủ Nhật (Sáng)', time: '07:00 - 11:00', status: 'work', note: '', isExpanded: false, iconIndex: 0 }, 
-            { id: 'cnc', day: 'Chủ Nhật (Chiều)', time: '17:30 - 21:00', status: 'work', note: '', isExpanded: false, iconIndex: 0 }, 
-        ];
+        const slides = document.querySelectorAll('.slide');
+        const progressBar = document.getElementById('progress');
+        const pageText = document.getElementById('footer-page');
+        const btnPrev = document.getElementById('btn-prev');
+        const btnNext = document.getElementById('btn-next');
+        const btnNotes = document.getElementById('btn-notes');
+        const panelNotes = document.getElementById('panel-notes');
+        const btnFullscreen = document.getElementById('btn-fullscreen');
+        const btnDownload = document.getElementById('btn-download');
+        
+        // Các nút Phóng to ảnh
+        const btnToggleImg1 = document.getElementById('btn-toggle-image-1');
+        const btnToggleImg2 = document.getElementById('btn-toggle-image-2');
+        const iconToggleImg1 = btnToggleImg1.querySelector('i');
+        const iconToggleImg2 = btnToggleImg2.querySelector('i');
+        const numToggleImg1 = document.getElementById('span-num-1');
+        const iconFullscreen = btnFullscreen.querySelector('i');
+        
+        let currentSlide = 0;
+        const totalSlides = slides.length;
+        let balloonInterval; 
 
-        // --- HỆ THỐNG HOA VĂN (PATTERNS) ---
-        const bgPatterns = {
-            hearts: `<svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><path d="M20 31.7l-1.3-1.2C12.9 25.3 9 21.9 9 17.7c0-3.4 2.6-6 6-6 1.9 0 3.8.9 4.9 2.3 1.1-1.4 3-2.3 4.9-2.3 3.4 0 6 2.6 6 6 0 4.2-3.9 7.6-9.7 12.8L20 31.7z" fill="currentColor" fill-rule="evenodd"/></svg>`,
-            medical: `<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M11 11V7h2v4h4v2h-4v4h-2v-4H7v-2h4z" fill="currentColor" fill-rule="evenodd"/></svg>`,
-            waves: `<svg width="60" height="12" viewBox="0 0 60 12" xmlns="http://www.w3.org/2000/svg"><path d="M30 6C20 6 15 0 0 0v12c15 0 20-6 30-6s15 6 30 6V0c-15 0-20 6-30 6z" fill="currentColor" fill-rule="evenodd"/></svg>`,
-            leaves: `<svg width="30" height="30" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg"><path d="M15 0C8 0 0 8 0 15v15h15c7 0 15-8 15-15V0H15zm0 28C9 28 2 21 2 15V2h13c7 0 14 7 14 13v13H15z" fill="currentColor" fill-rule="evenodd"/></svg>`,
-            circles: `<svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><circle cx="20" cy="20" r="18" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="20" cy="20" r="8" fill="none" stroke="currentColor" stroke-width="1"/></svg>`,
-            grid: `<svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M20 0v20H0V0h20zm-1 1H1v18h18V1z" fill="currentColor" fill-rule="evenodd"/></svg>`,
-            diamonds: `<svg width="30" height="30" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg"><path d="M15 0L30 15L15 30L0 15z" fill="none" stroke="currentColor" stroke-width="1" fill-rule="evenodd"/></svg>`,
-            dots: `<svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><circle cx="3" cy="3" r="2" fill="currentColor"/></svg>`,
-            triangles: `<svg width="30" height="30" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg"><path d="M15 0l15 30H0z" fill="none" stroke="currentColor" stroke-width="1" fill-rule="evenodd"/></svg>`,
-            flower: `<svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><path d="M30 10 Q40 5 45 15 Q55 20 45 30 Q55 40 45 45 Q40 55 30 45 Q20 55 15 45 Q5 40 15 30 Q5 20 15 15 Q20 5 30 10 Z" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="30" cy="30" r="5" fill="currentColor"/></svg>`,
-            vintage: `<svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><path d="M20 0 C20 10 30 10 30 20 C30 30 20 30 20 40 C20 30 10 30 10 20 C10 10 20 10 20 0 Z" fill="currentColor" opacity="0.6"/></svg>`,
-            lotus: `<svg width="50" height="50" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg"><path d="M25 10 C30 20 40 25 45 25 C35 30 30 40 25 45 C20 40 15 30 5 25 C10 25 20 20 25 10 Z" fill="currentColor" opacity="0.8"/></svg>`
+        // Đổi Giao Diện (Theme)
+        function setTheme(themeName) {
+            document.documentElement.setAttribute('data-theme', themeName);
+        }
+
+        function updateSlide(isMovingForward = true) {
+            slides.forEach(slide => {
+                slide.classList.remove('active');
+                // Reset hiệu ứng phóng to ảnh khi chuyển slide
+                const splitLayout = slide.querySelector('.split-layout');
+                if(splitLayout) {
+                    splitLayout.classList.remove('image-expanded', 'image-1-expanded', 'image-2-expanded');
+                }
+            });
+            
+            iconToggleImg1.className = 'fa-solid fa-magnifying-glass-plus';
+            iconToggleImg2.className = 'fa-solid fa-magnifying-glass-plus';
+
+            const activeSlide = slides[currentSlide];
+            activeSlide.classList.add('active');
+            
+            // Xử lý ẩn/hiện nút Phóng to ảnh (hỗ trợ 1 ảnh và 2 ảnh)
+            const splitLayout = activeSlide.querySelector('.split-layout');
+            const imageContainers = activeSlide.querySelectorAll('.image-caption-container');
+            
+            if (splitLayout && imageContainers.length > 0) {
+                btnToggleImg1.style.display = 'flex';
+                if (imageContainers.length > 1) {
+                    btnToggleImg2.style.display = 'flex';
+                    numToggleImg1.style.display = 'inline'; // Hiện số 1
+                } else {
+                    btnToggleImg2.style.display = 'none';
+                    numToggleImg1.style.display = 'none'; // Ẩn số 1, chỉ để icon kính lúp
+                }
+            } else {
+                btnToggleImg1.style.display = 'none';
+                btnToggleImg2.style.display = 'none';
+            }
+
+            const listItems = activeSlide.querySelectorAll('ul li');
+            if (isMovingForward) {
+                listItems.forEach(li => li.classList.remove('visible'));
+            } else {
+                listItems.forEach(li => li.classList.add('visible'));
+            }
+
+            pageText.innerText = `${currentSlide + 1} / ${totalSlides}`;
+            progressBar.style.width = `${((currentSlide + 1) / totalSlides) * 100}%`;
+            
+            btnPrev.disabled = currentSlide === 0;
+            btnNext.disabled = currentSlide === totalSlides - 1 && activeSlide.querySelectorAll('ul li:not(.visible)').length === 0;
+
+            const currentNotes = activeSlide.getAttribute('data-notes');
+            panelNotes.style.display = 'none';
+            if (currentNotes) {
+                btnNotes.style.display = 'flex';
+                panelNotes.innerText = currentNotes;
+            } else {
+                btnNotes.style.display = 'none';
+            }
+
+            if (activeSlide.classList.contains('thank-you-slide')) {
+                triggerBalloons(true);
+            } else {
+                triggerBalloons(false);
+            }
+        }
+
+        function triggerBalloons(isActive) {
+            const container = document.getElementById('balloon-container');
+            if (!container) return;
+
+            if (isActive) {
+                balloonInterval = setInterval(() => {
+                    const balloon = document.createElement('div');
+                    balloon.classList.add('balloon');
+                    balloon.innerText = '🎈';
+                    
+                    const hue = Math.floor(Math.random() * 360);
+                    balloon.style.filter = `hue-rotate(${hue}deg) drop-shadow(0 5px 5px rgba(0,0,0,0.2))`;
+                    
+                    balloon.style.left = Math.random() * 90 + 5 + '%';
+                    const duration = Math.random() * 2 + 3; 
+                    balloon.style.animationDuration = duration + 's';
+                    
+                    container.appendChild(balloon);
+
+                    setTimeout(() => {
+                        balloon.innerHTML = '✨'; 
+                        balloon.classList.add('pop');
+                        
+                        setTimeout(() => {
+                            if (balloon.parentNode) balloon.remove();
+                        }, 300);
+                    }, duration * 1000 * (0.6 + Math.random() * 0.2));
+
+                }, 400);
+            } else {
+                clearInterval(balloonInterval);
+                container.innerHTML = ''; 
+            }
+        }
+
+        // --- BỔ SUNG ÂM THANH MARIO BẰNG WEB AUDIO API ---
+        function playMarioSound(isCorrect) {
+            try {
+                // Khởi tạo AudioContext (sẽ tự kích hoạt khi có User Gesture như thao tác click)
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (!AudioContext) return;
+                const ctx = new AudioContext();
+                const osc = ctx.createOscillator();
+                const gainNode = ctx.createGain();
+                
+                osc.connect(gainNode);
+                gainNode.connect(ctx.destination);
+
+                if (isCorrect) {
+                    // Âm thanh Mario Coin (Đúng)
+                    osc.type = 'square';
+                    osc.frequency.setValueAtTime(987.77, ctx.currentTime); // Nốt B5
+                    gainNode.gain.setValueAtTime(0.1, ctx.currentTime);
+                    osc.frequency.setValueAtTime(1318.51, ctx.currentTime + 0.1); // Nốt E6
+                    gainNode.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + 0.4);
+                    osc.start(ctx.currentTime);
+                    osc.stop(ctx.currentTime + 0.5);
+                } else {
+                    // Âm thanh Mario Bump/Die (Sai)
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(150, ctx.currentTime); // Tần số trầm
+                    gainNode.gain.setValueAtTime(0.15, ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(60, ctx.currentTime + 0.2); // Tụt nhanh
+                    gainNode.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + 0.2);
+                    osc.start(ctx.currentTime);
+                    osc.stop(ctx.currentTime + 0.3);
+                }
+            } catch (e) {
+                console.log("Audio not supported or blocked by browser", e);
+            }
+        }
+
+        window.checkAnswer = function(btn, isCorrect, letter) {
+            const container = btn.closest('.quiz-container');
+            const feedback = container.querySelector('.quiz-feedback');
+            const allBtns = container.querySelectorAll('.quiz-btn');
+
+            allBtns.forEach(b => {
+                b.style.pointerEvents = 'none'; 
+                if(b.getAttribute('onclick').includes('true') && !isCorrect) {
+                    b.classList.add('reveal-correct');
+                    const correctLetterSpan = b.querySelector('.option-letter');
+                    if(correctLetterSpan) correctLetterSpan.innerHTML = '<i class="fa-solid fa-check"></i>';
+                }
+            });
+
+            const letterSpan = btn.querySelector('.option-letter');
+
+            if(isCorrect) {
+                playMarioSound(true); // Gọi âm thanh đúng
+                btn.classList.add('correct');
+                if(letterSpan) letterSpan.innerHTML = '<i class="fa-solid fa-check"></i>';
+                feedback.innerHTML = '<div class="alert alert-success"><i class="fa-solid fa-circle-check"></i> Chính xác! Tuyệt vời!</div>';
+                feedback.classList.add('show');
+            } else {
+                playMarioSound(false); // Gọi âm thanh sai
+                btn.classList.add('wrong');
+                if(letterSpan) letterSpan.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+                feedback.innerHTML = '<div class="alert alert-danger"><i class="fa-solid fa-circle-xmark"></i> Sai rồi, đáp án đúng đã được đánh dấu màu xanh!</div>';
+                feedback.classList.add('show');
+            }
+        }
+
+        // Logic Mở Rộng Ảnh 1 (hoặc ảnh duy nhất)
+        btnToggleImg1.onclick = () => {
+            const activeSlide = slides[currentSlide];
+            const splitLayout = activeSlide.querySelector('.split-layout');
+            const numImages = activeSlide.querySelectorAll('.image-caption-container').length;
+            if (!splitLayout) return;
+            
+            if (numImages === 1) {
+                splitLayout.classList.toggle('image-expanded');
+                iconToggleImg1.className = splitLayout.classList.contains('image-expanded') ? 'fa-solid fa-magnifying-glass-minus' : 'fa-solid fa-magnifying-glass-plus';
+            } else {
+                if (splitLayout.classList.contains('image-1-expanded')) {
+                    splitLayout.classList.remove('image-1-expanded');
+                    iconToggleImg1.className = 'fa-solid fa-magnifying-glass-plus';
+                } else {
+                    splitLayout.classList.remove('image-2-expanded');
+                    splitLayout.classList.add('image-1-expanded');
+                    iconToggleImg1.className = 'fa-solid fa-magnifying-glass-minus';
+                    iconToggleImg2.className = 'fa-solid fa-magnifying-glass-plus';
+                }
+            }
         };
 
-        // --- DATA THEMES ---
-        const themes = [
-            { id: 1, name: 'Hồng Ấm Áp', bg: 'bg-gradient-to-br from-rose-50 to-pink-100', text: 'text-rose-950', boxBorder: 'border-rose-200/80', accent: 'bg-rose-400', iconColor: 'text-rose-500', patternType: 'flower', pColor: '#e11d48', pOpacity: 0.05, watermark: 'fa-baby-carriage', innerBorder: 'border-rose-300 border-solid border-[2px]' },
-            { id: 2, name: 'Trắng Tinh Khiết', bg: 'bg-white', text: 'text-slate-800', boxBorder: 'border-slate-200', accent: 'bg-rose-300', iconColor: 'text-rose-400', patternType: 'vintage', pColor: '#cbd5e1', pOpacity: 0.15, watermark: 'fa-stethoscope', innerBorder: 'border-rose-200 border-double border-[5px]' },
-            { id: 3, name: 'Xanh Hy Vọng', bg: 'bg-gradient-to-br from-sky-50 to-blue-100', text: 'text-sky-950', boxBorder: 'border-sky-200/80', accent: 'bg-sky-500', iconColor: 'text-sky-600', patternType: 'medical', pColor: '#0284c7', pOpacity: 0.05, watermark: 'fa-kit-medical', innerBorder: 'border-sky-300 border-dashed border-[2px]' },
-            { id: 4, name: 'Tím Bình Yên', bg: 'bg-gradient-to-br from-fuchsia-50 to-purple-100', text: 'text-purple-950', boxBorder: 'border-purple-200/80', accent: 'bg-purple-500', iconColor: 'text-purple-600', patternType: 'lotus', pColor: '#9333ea', pOpacity: 0.05, watermark: 'fa-spa', innerBorder: 'border-purple-300 border-solid border-[3px]' },
-            { id: 5, name: 'Xanh Ngọc Bích', bg: 'bg-gradient-to-br from-teal-50 to-emerald-100', text: 'text-teal-950', boxBorder: 'border-teal-200/80', accent: 'bg-teal-500', iconColor: 'text-teal-600', patternType: 'leaves', pColor: '#0d9488', pOpacity: 0.05, watermark: 'fa-leaf', innerBorder: 'border-teal-400/60 border-dotted border-[4px]' },
-            { id: 6, name: 'Be Nhã Nhặn', bg: 'bg-gradient-to-br from-stone-50 to-orange-50', text: 'text-stone-800', boxBorder: 'border-stone-200', accent: 'bg-stone-400', iconColor: 'text-stone-500', patternType: 'lotus', pColor: '#78716c', pOpacity: 0.05, watermark: 'fa-notes-medical', innerBorder: 'border-stone-300 border-solid border-[1px]' },
-            { id: 7, name: 'Hồng Cẩm Thạch', bg: 'bg-gradient-to-br from-red-50 via-rose-50 to-pink-50', text: 'text-rose-900', boxBorder: 'border-rose-200', accent: 'bg-rose-500', iconColor: 'text-rose-500', patternType: 'waves', pColor: '#be123c', pOpacity: 0.04, watermark: 'fa-heart-pulse', innerBorder: 'border-rose-200 border-double border-[6px]' },
-            { id: 8, name: 'Xanh Bác Sĩ', bg: 'bg-gradient-to-br from-slate-800 to-blue-950', text: 'text-blue-50', boxBorder: 'border-blue-700/50', accent: 'bg-blue-400', iconColor: 'text-blue-300', patternType: 'grid', pColor: '#93c5fd', pOpacity: 0.05, watermark: 'fa-user-doctor', innerBorder: 'border-blue-500/30 border-solid border-[2px]' },
-            { id: 9, name: 'Vàng Nắng Sớm', bg: 'bg-gradient-to-br from-amber-50 to-yellow-50', text: 'text-amber-900', boxBorder: 'border-amber-200/80', accent: 'bg-amber-500', iconColor: 'text-amber-500', patternType: 'circles', pColor: '#d97706', pOpacity: 0.05, watermark: 'fa-sun', innerBorder: 'border-amber-300 border-dashed border-[2px]' },
-            { id: 10, name: 'Tím Hoàng Gia', bg: 'bg-gradient-to-br from-indigo-900 to-purple-900', text: 'text-purple-50', boxBorder: 'border-purple-700/50', accent: 'bg-purple-400', iconColor: 'text-purple-300', patternType: 'diamonds', pColor: '#d8b4fe', pOpacity: 0.05, watermark: 'fa-star-of-life', innerBorder: 'border-purple-400/40 border-double border-[4px]' },
-            { id: 11, name: 'Hồng Đào Tươi', bg: 'bg-gradient-to-br from-red-50 to-orange-50', text: 'text-red-950', boxBorder: 'border-red-200/80', accent: 'bg-red-400', iconColor: 'text-red-500', patternType: 'hearts', pColor: '#ef4444', pOpacity: 0.05, watermark: 'fa-person-pregnant', innerBorder: 'border-red-300 border-solid border-[2px]' },
-            { id: 12, name: 'Tím Phấn Mơ', bg: 'bg-gradient-to-br from-fuchsia-100 to-pink-50', text: 'text-fuchsia-950', boxBorder: 'border-fuchsia-200/80', accent: 'bg-fuchsia-400', iconColor: 'text-fuchsia-500', patternType: 'flower', pColor: '#d946ef', pOpacity: 0.06, watermark: 'fa-venus', innerBorder: 'border-fuchsia-300 border-dashed border-[2px]' },
-            { id: 13, name: 'Sữa Ngọt Ngào', bg: 'bg-gradient-to-tr from-orange-50 via-white to-rose-50', text: 'text-stone-800', boxBorder: 'border-rose-200', accent: 'bg-rose-300', iconColor: 'text-rose-400', patternType: 'vintage', pColor: '#f43f5e', pOpacity: 0.03, watermark: 'fa-spa', innerBorder: 'border-rose-200 border-double border-[4px]' },
-            { id: 14, name: 'Đỏ Rượu Vang', bg: 'bg-gradient-to-br from-rose-900 to-red-950', text: 'text-rose-50', boxBorder: 'border-rose-700/50', accent: 'bg-rose-400', iconColor: 'text-rose-300', patternType: 'diamonds', pColor: '#fda4af', pOpacity: 0.06, watermark: 'fa-gem', innerBorder: 'border-rose-500/40 border-solid border-[3px]' },
-            { id: 15, name: 'Xanh Mint Dịu', bg: 'bg-gradient-to-br from-teal-50 to-emerald-50', text: 'text-teal-950', boxBorder: 'border-teal-200/80', accent: 'bg-teal-400', iconColor: 'text-teal-500', patternType: 'leaves', pColor: '#14b8a6', pOpacity: 0.05, watermark: 'fa-leaf', innerBorder: 'border-teal-300 border-dotted border-[3px]' }
-        ];
-
-        let currentThemeId = 1;
-
-        // --- KHỞI TẠO ỨNG DỤNG ---
-        function initApp() {
-            renderScheduleControls();
-            renderThemeControls();
-            applyTheme(currentThemeId);
-            updatePreview();
-            adjustScale(); // Điều chỉnh tỷ lệ khung nhìn
-            window.addEventListener('resize', adjustScale);
-        }
-
-        // --- HÀM ẨN/HIỆN CÁC MỤC ĐIỀU KHIỂN ---
-        function toggleSection(sectionId) {
-            const section = document.getElementById(sectionId);
-            const icon = document.getElementById(sectionId + '-icon');
+        // Logic Mở Rộng Ảnh 2
+        btnToggleImg2.onclick = () => {
+            const activeSlide = slides[currentSlide];
+            const splitLayout = activeSlide.querySelector('.split-layout');
+            if (!splitLayout) return;
             
-            if (section.classList.contains('hidden')) {
-                section.classList.remove('hidden');
-                section.classList.add('block');
-                icon.classList.remove('fa-chevron-down');
-                icon.classList.add('fa-chevron-up');
+            if (splitLayout.classList.contains('image-2-expanded')) {
+                splitLayout.classList.remove('image-2-expanded');
+                iconToggleImg2.className = 'fa-solid fa-magnifying-glass-plus';
             } else {
-                section.classList.remove('block');
-                section.classList.add('hidden');
-                icon.classList.remove('fa-chevron-up');
-                icon.classList.add('fa-chevron-down');
+                splitLayout.classList.remove('image-1-expanded');
+                splitLayout.classList.add('image-2-expanded');
+                iconToggleImg2.className = 'fa-solid fa-magnifying-glass-minus';
+                iconToggleImg1.className = 'fa-solid fa-magnifying-glass-plus';
             }
-        }
+        };
 
-        // --- ĐIỀU CHỈNH TỶ LỆ XEM TRƯỚC DỰA TRÊN MÀN HÌNH ---
-        function adjustScale() {
-            const wrapper = document.getElementById('preview-wrapper');
-            const card = document.getElementById('preview-card');
+        function nextAction() {
+            const activeSlide = slides[currentSlide];
+            const hiddenItems = activeSlide.querySelectorAll('ul li:not(.visible)');
             
-            // Vô hiệu hóa co ảnh trên điện thoại để luôn giữ nguyên độ phân giải 100%
-            card.style.transform = `scale(1)`;
-            wrapper.style.height = `${card.offsetHeight}px`;
-            wrapper.style.width = `440px`;
-        }
-
-        // --- RENDER BẢNG ĐIỀU KHIỂN LỊCH (CHẾ ĐỘ ẨN/HIỆN ACCORDION) ---
-        function renderScheduleControls() {
-            const container = document.getElementById('schedule-controls');
-            container.innerHTML = '';
-
-            schedules.forEach((item, index) => {
-                const dayColor = item.status === 'off' ? 'text-red-500' : 'text-gray-800';
-                
-                let currentIcon = { icon: dayIcons[item.iconIndex].icon, color: 'text-blue-500' };
-                if (item.status === 'off') {
-                    currentIcon = { icon: 'fa-circle-xmark', color: 'text-red-500' };
+            if (hiddenItems.length > 0) {
+                hiddenItems[0].classList.add('visible');
+                if (currentSlide === totalSlides - 1 && hiddenItems.length === 1) {
+                    btnNext.disabled = true;
                 }
-
-                const html = `
-                    <div class="flex flex-col p-3 rounded-xl border ${item.status === 'work' ? 'border-blue-200 bg-blue-50/40' : 'border-gray-200 bg-gray-50'} transition-all duration-300 shadow-sm overflow-hidden">
-                        
-                        <!-- Dòng hiển thị ngày (Click để mở) -->
-                        <div class="flex items-center justify-between cursor-pointer" onclick="toggleEdit(${index})">
-                            <div class="flex flex-col w-full">
-                                <div class="flex items-center gap-2.5">
-                                    <button onclick="event.stopPropagation(); cycleIcon(${index})" class="w-[28px] h-[28px] shrink-0 flex items-center justify-center rounded-full bg-white border border-gray-200 hover:bg-gray-100 transition-colors shadow-sm active:scale-90" title="Nhấp để đổi biểu tượng">
-                                        <i class="fa-solid ${currentIcon.icon} ${currentIcon.color} text-[12px]"></i>
-                                    </button>
-                                    <span class="font-bold text-[15px] ${dayColor}">${item.day}</span>
-                                </div>
-                                ${!item.isExpanded ? `<span class="text-[12px] text-gray-500 mt-1 font-medium ml-[38px]"><i class="fa-regular fa-clock"></i> ${item.status === 'work' ? item.time : '<span class="text-red-500 font-bold">Nghỉ</span>'} ${item.note ? ` <span class="opacity-60">| ${item.note}</span>` : ''}</span>` : ''}
-                            </div>
-                            <div class="flex items-center gap-2 pl-3">
-                                <!-- Nút đổi nhanh trạng thái khi thu gọn -->
-                                ${!item.isExpanded ? `<button onclick="event.stopPropagation(); toggleStatus(${index})" class="cursor-pointer active:scale-90 px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all duration-200 shadow-sm ${item.status === 'work' ? 'bg-blue-100 text-blue-600 border border-blue-200 hover:bg-blue-200' : 'bg-red-100 text-red-500 border border-red-200 hover:bg-red-200'}">${item.status === 'work' ? 'Làm' : 'Nghỉ'}</button>` : ''}
-                                <i class="fa-solid fa-chevron-${item.isExpanded ? 'up' : 'down'} text-gray-400 text-sm"></i>
-                            </div>
-                        </div>
-
-                        <!-- Khối chỉnh sửa (Chỉ hiện khi Click) -->
-                        ${item.isExpanded ? `
-                        <div class="flex flex-col gap-3 mt-3 pt-3 border-t border-gray-200/80 pl-[38px]">
-                            <!-- Công tắc Toggle Trượt Mượt Mà -->
-                            <div class="relative flex bg-gray-200/80 rounded-lg p-0.5 w-[140px] cursor-pointer shadow-inner select-none active:scale-[0.98] transition-transform" onclick="event.stopPropagation(); toggleStatus(${index})">
-                                <!-- Thanh trượt nền trắng -->
-                                <div class="absolute top-0.5 bottom-0.5 w-[calc(50%-2px)] bg-white rounded-md shadow-sm transition-all duration-300 ease-in-out ${item.status === 'work' ? 'left-0.5' : 'left-[calc(50%+1px)]'}"></div>
-                                
-                                <div class="relative flex-1 flex items-center justify-center py-1.5 text-xs font-bold z-10 transition-colors duration-300 ${item.status === 'work' ? 'text-blue-600' : 'text-gray-500'}">Làm</div>
-                                <div class="relative flex-1 flex items-center justify-center py-1.5 text-xs font-bold z-10 transition-colors duration-300 ${item.status === 'off' ? 'text-red-500' : 'text-gray-500'}">Nghỉ</div>
-                            </div>
-
-                            <div class="flex items-center text-sm text-gray-600 bg-white border border-gray-300 rounded-lg px-3 py-2 shadow-sm focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500 transition-all">
-                                <i class="fa-regular fa-clock mr-2.5 text-gray-400"></i>
-                                <input type="text" value="${item.time}" oninput="updateTime(${index}, this.value)" onclick="event.stopPropagation()" class="w-full outline-none bg-transparent text-gray-800 text-[14px] font-semibold h-full">
-                            </div>
-                            <input type="text" placeholder="Ghi chú (VD: Khám thai, Nghỉ bù...)" value="${item.note || ''}" oninput="updateNote(${index}, this.value)" onclick="event.stopPropagation()" class="w-full text-[13px] border border-gray-300 rounded-lg px-3 py-2.5 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none text-gray-800 bg-white">
-                        </div>
-                        ` : ''}
-                    </div>
-                `;
-                container.innerHTML += html;
-            });
-        }
-
-        // --- CÁC HÀM XỬ LÝ SỰ KIỆN LỊCH ---
-        function toggleEdit(index) {
-            schedules[index].isExpanded = !schedules[index].isExpanded;
-            renderScheduleControls();
-        }
-
-        function toggleStatus(index) {
-            schedules[index].status = schedules[index].status === 'work' ? 'off' : 'work';
-            renderScheduleControls();
-            updatePreview();
-        }
-
-        function updateTime(index, value) {
-            schedules[index].time = value;
-            updatePreview();
-        }
-
-        function updateNote(index, value) {
-            schedules[index].note = value;
-            updatePreview();
-        }
-
-        function cycleIcon(index) {
-            // Tăng index icon lên 1, nếu vượt quá số lượng icon thì quay về 0
-            schedules[index].iconIndex = (schedules[index].iconIndex + 1) % dayIcons.length;
-            renderScheduleControls();
-            updatePreview();
-        }
-
-        // --- RENDER BẢNG CHỌN THEME ---
-        function renderThemeControls() {
-            const container = document.getElementById('theme-controls');
-            container.innerHTML = '';
-
-            themes.forEach(theme => {
-                const isActive = theme.id === currentThemeId;
-                
-                // Trích xuất background để hiện thị cục màu nhỏ
-                let bgStyle = '';
-                if(theme.bg.includes('bg-gradient')){
-                    bgStyle = theme.bg;
-                } else if(theme.bg.includes('bg-white')){
-                    bgStyle = 'bg-white border-2 border-gray-200';
-                } else {
-                    bgStyle = theme.bg;
-                }
-
-                const html = `
-                    <button onclick="applyTheme(${theme.id})" title="${theme.name}" class="relative flex flex-col items-center gap-1.5 group flex-shrink-0 snap-center w-[72px]">
-                        <div class="w-14 h-14 rounded-full ${bgStyle} border-2 ${isActive ? 'border-blue-500 scale-105 shadow-lg' : 'border-transparent shadow-sm'} transition-all duration-200 flex items-center justify-center">
-                            ${isActive ? '<i class="fa-solid fa-check text-white drop-shadow-md text-base"></i>' : ''}
-                        </div>
-                        <span class="text-[11px] ${isActive ? 'text-blue-700 font-bold' : 'text-gray-500 font-medium'} group-hover:text-gray-800 text-center leading-tight h-8 flex items-start justify-center w-full px-1">${theme.name}</span>
-                    </button>
-                `;
-                container.innerHTML += html;
-            });
-        }
-
-        // --- ÁP DỤNG THEME ---
-        function applyTheme(id) {
-            currentThemeId = id;
-            renderThemeControls();
-
-            const theme = themes.find(t => t.id === id);
-            const card = document.getElementById('preview-card');
-            const decorator = document.getElementById('theme-decorator');
-            const innerBorderLayer = document.getElementById('theme-inner-border');
-            const logo = document.getElementById('clinic-logo');
-            const scheduleBox = document.getElementById('preview-schedule-box');
-            
-            const patternLayer = document.getElementById('theme-pattern');
-            const watermarkLayer = document.getElementById('theme-watermark');
-            const doctorBox = document.getElementById('preview-doctor-box');
-            const phoneBox = document.getElementById('preview-phone-box');
-            const dateRange = document.getElementById('preview-date-range');
-
-            // Cập nhật background
-            card.className = 'p-5 rounded-2xl shadow-2xl relative transition-all duration-500 overflow-hidden';
-            card.className += ` ${theme.bg} ${theme.text}`;
-            
-            // Cập nhật decorator (top bar) & inner border
-            decorator.className = `absolute top-0 left-0 w-full h-2 z-30 ${theme.accent}`;
-            if (innerBorderLayer) {
-                innerBorderLayer.className = `absolute inset-1.5 z-20 pointer-events-none rounded-xl transition-all duration-300 ${theme.innerBorder}`;
-            }
-
-            // Cập nhật logo
-            if(logo) {
-                logo.className = `w-[100px] h-[100px] rounded-[22px] bg-white p-1.5 object-contain shadow-[0_4px_15px_-3px_rgba(0,0,0,0.1)] border-2 transition-colors duration-300 ${theme.boxBorder}`;
-            }
-            
-            // Cập nhật Hoa Văn (Pattern)
-            const svgPattern = bgPatterns[theme.patternType].replace('currentColor', encodeURIComponent(theme.pColor));
-            patternLayer.style.backgroundImage = `url("data:image/svg+xml,${svgPattern}")`;
-            patternLayer.style.opacity = theme.pOpacity;
-            
-            // Cập nhật Watermark
-            watermarkLayer.innerHTML = `<i class="fa-solid ${theme.watermark}"></i>`;
-
-            // Style Hộp Lịch
-            scheduleBox.className = `backdrop-blur-md rounded-xl p-3 shadow-sm border transition-colors duration-300 ${theme.boxBorder}`;
-            
-            // Đặc biệt cho theme nền tối (8, 10, 14)
-            if (id === 8 || id === 10 || id === 14) {
-                scheduleBox.className += ' bg-black/20 border-opacity-30';
-                card.style.border = '1px solid rgba(255,255,255,0.1)';
-                dateRange.className = 'text-[12px] font-medium opacity-90 italic text-white/80';
-                
-                // Doctor Box Dark Mode
-                doctorBox.className = 'mb-2 bg-black/40 rounded-xl py-2 px-2 shadow-sm flex flex-col items-center border border-white/10 backdrop-blur-md';
-                phoneBox.className = 'inline-flex items-center justify-center gap-2 font-bold text-[15px] bg-black/60 px-4 py-1.5 rounded-full shadow-md border border-white/10';
             } else {
-                scheduleBox.className += ' bg-white/60';
-                card.style.border = 'none';
-                dateRange.className = `text-[12px] font-medium opacity-90 italic ${theme.text}`;
-                
-                // Doctor Box Light Mode
-                doctorBox.className = 'mb-2 bg-white/40 rounded-xl py-2 px-2 shadow-sm flex flex-col items-center border border-white/40 backdrop-blur-md';
-                phoneBox.className = `inline-flex items-center justify-center gap-2 font-bold text-[15px] bg-white px-4 py-1.5 rounded-full shadow-md ${theme.text}`;
+                if (currentSlide < totalSlides - 1) {
+                    currentSlide++;
+                    updateSlide(true);
+                }
             }
-
-            updatePreview(); // Re-render text colors inside schedule based on theme
         }
 
-        // --- CẬP NHẬT PREVIEW VÀ TÔ MÀU CUỐI TUẦN ---
-        function updatePreview() {
-            const listContainer = document.getElementById('preview-schedule-list');
-            listContainer.innerHTML = '';
-            const theme = themes.find(t => t.id === currentThemeId);
-            const isDarkTheme = theme.id === 8 || theme.id === 10 || theme.id === 14;
+        function prevAction() {
+            const activeSlide = slides[currentSlide];
+            const visibleItems = activeSlide.querySelectorAll('ul li.visible');
 
-            schedules.forEach(item => {
-                let statusHtml = '';
-                
-                // Lấy màu icon theo thiết lập hoặc chỉnh sáng lên nếu đang dùng Theme tối
-                let iconBaseColor = dayIcons[item.iconIndex].color;
-                if (isDarkTheme) {
-                    iconBaseColor = iconBaseColor.replace('600', '400').replace('500', '400');
-                }
-                
-                let currentIcon = { icon: dayIcons[item.iconIndex].icon, color: iconBaseColor };
-                if (item.status === 'off') {
-                    currentIcon = { icon: 'fa-circle-xmark', color: isDarkTheme ? 'text-red-400' : 'text-red-600' };
-                }
-                
-                let rowClass = 'flex flex-col py-1.5 border-b last:border-0 border-dashed ';
-                
-                // Thay đổi màu nhấn dựa trên trạng thái làm/nghỉ thay vì cuối tuần
-                let dayColorClass = item.status === 'off' ? (isDarkTheme ? 'text-red-400' : 'text-red-600') : '';
-
-                if (item.status === 'work') {
-                    statusHtml = `<span class="font-bold">${item.time}</span>`;
-                    rowClass += isDarkTheme ? 'border-gray-600' : 'border-gray-300/80';
-                } else {
-                    statusHtml = `<span class="font-bold uppercase tracking-wider ${isDarkTheme ? 'text-red-400' : 'text-red-600'}">NGHỈ</span>`;
-                    rowClass += isDarkTheme ? 'border-gray-600 opacity-80' : 'border-gray-300/80 text-gray-500';
-                }
-
-                // Nếu có ghi chú sẽ hiển thị dòng nhỏ dưới thời gian
-                let noteHtml = item.note ? `<div class="text-[11.5px] font-semibold italic mt-0.5 text-left opacity-90 pl-[24px]">* ${item.note}</div>` : '';
-
-                const html = `
-                    <div class="${rowClass}">
-                        <div class="flex justify-between items-center w-full">
-                            <span class="${item.status === 'work' ? 'font-bold' : 'font-medium'} ${dayColorClass} flex items-center gap-2.5">
-                                <i class="fa-solid ${currentIcon.icon} ${currentIcon.color} text-[14px] drop-shadow-sm w-4 text-center"></i>
-                                ${item.day}
-                            </span>
-                            ${statusHtml}
-                        </div>
-                        ${noteHtml}
-                    </div>
-                `;
-                listContainer.innerHTML += html;
-            });
-            
-            // Recalculate height if needed
-            setTimeout(adjustScale, 50);
-        }
-
-        // --- XỬ LÝ NGÀY THÁNG ÁP DỤNG ---
-        function formatDate(dateString) {
-            if (!dateString) return "";
-            const parts = dateString.split('-');
-            if (parts.length === 3) {
-                return `${parts[2]}/${parts[1]}/${parts[0]}`;
-            }
-            return dateString;
-        }
-
-        function updateDateRange() {
-            const from = document.getElementById('date-from').value;
-            const to = document.getElementById('date-to').value;
-            const previewText = document.getElementById('preview-date-range');
-            
-            if (from && to) {
-                previewText.innerText = `(Áp dụng từ ${formatDate(from)} đến ${formatDate(to)})`;
-            } else if (from) {
-                previewText.innerText = `(Áp dụng từ ${formatDate(from)})`;
-            } else if (to) {
-                previewText.innerText = `(Áp dụng đến ${formatDate(to)})`;
+            if (visibleItems.length > 0) {
+                visibleItems[visibleItems.length - 1].classList.remove('visible');
+                btnNext.disabled = false;
             } else {
-                previewText.innerText = "";
+                if (currentSlide > 0) {
+                    currentSlide--;
+                    updateSlide(false);
+                }
             }
         }
 
-        function setupDefaultDates() {
-            const today = new Date();
-            
-            // Tìm ngày Thứ 2 kế tiếp so với ngày hiện tại
-            let daysUntilNextMonday = (1 - today.getDay() + 7) % 7;
-            // Nếu hôm nay đã là Thứ 2, lấy Thứ 2 của tuần sau (cộng thêm 7 ngày)
-            if (daysUntilNextMonday === 0) daysUntilNextMonday = 7; 
-            
-            const nextMonday = new Date(today);
-            nextMonday.setDate(today.getDate() + daysUntilNextMonday);
-            
-            // Tìm ngày Chủ nhật của 4 tuần sau (cộng thêm 27 ngày tính từ Thứ 2 đó)
-            const endSunday = new Date(nextMonday);
-            endSunday.setDate(nextMonday.getDate() + 27);
-            
-            const fmt = (date) => {
-                const offset = date.getTimezoneOffset();
-                let tzDate = new Date(date.getTime() - (offset*60*1000));
-                return tzDate.toISOString().split('T')[0];
-            };
-            
-            document.getElementById('date-from').value = fmt(nextMonday);
-            document.getElementById('date-to').value = fmt(endSunday);
-            updateDateRange();
-        }
+        btnNext.addEventListener('click', nextAction);
+        btnPrev.addEventListener('click', prevAction);
 
-        function generateQRCode() {
-            const qrContainer = document.getElementById("qrcode");
-            qrContainer.innerHTML = ""; // Clear existing just in case
-            new QRCode(qrContainer, {
-                text: "https://maps.app.goo.gl/pjDpDEKXcv2rqFNG7",
-                width: 64,
-                height: 64,
-                colorDark : "#1f2937",
-                colorLight : "#ffffff",
-                correctLevel : QRCode.CorrectLevel.L
-            });
-        }
+        document.getElementById('presentation-container').addEventListener('click', (e) => {
+            // Ngăn chặn chuyển slide khi bấm vào các nút điều khiển
+            if (e.target.closest('button') || e.target.closest('.controls') || e.target.closest('.notes-panel') || e.target.closest('.quiz-btn') || e.target.closest('.theme-dot')) return;
+            nextAction();
+        });
 
-        // --- KHỞI TẠO ỨNG DỤNG ---
-        function initApp() {
-            setupDefaultDates();
-            generateQRCode();
-            renderScheduleControls();
-            renderThemeControls();
-            applyTheme(currentThemeId);
-            updatePreview();
-            adjustScale(); // Điều chỉnh tỷ lệ khung nhìn
-            window.addEventListener('resize', adjustScale);
-        }
+        btnNotes.addEventListener('click', () => {
+            panelNotes.style.display = panelNotes.style.display === 'block' ? 'none' : 'block';
+        });
 
-        // --- XUẤT ẢNH 2K VÀ CHIA SẺ ---
-        
-        function showLoading() {
-            document.getElementById('loading-modal').style.display = 'flex';
-        }
-
-        function hideLoading() {
-            document.getElementById('loading-modal').style.display = 'none';
-        }
-
-        // Chụp ảnh bằng html2canvas với chuẩn 2K
-        async function getCanvas() {
-            const card = document.getElementById('preview-card');
-            const wrapper = document.getElementById('preview-wrapper');
-            const scrollContainer = wrapper.parentElement.parentElement; // Element có chứa scroll-x
-            
-            // Backup current inline styles & scroll position
-            const oldTransform = card.style.transform;
-            const oldWrapperHeight = wrapper.style.height;
-            const currentScrollY = window.scrollY;
-            const currentScrollX = scrollContainer.scrollLeft;
-
-            // Đưa thanh cuộn về vị trí trên cùng (Quan trọng: fix lỗi cắt khung trên điện thoại)
-            window.scrollTo(0, 0);
-            scrollContainer.scrollLeft = 0;
-
-            // Bắt buộc khung về đúng kích thước chuẩn
-            card.style.transform = 'scale(1)'; 
-            wrapper.style.height = `${card.offsetHeight}px`;
-            
-            showLoading();
-            
-            // Chờ giao diện render lại hoàn thiện
-            await new Promise(r => setTimeout(r, 200));
-
-            try {
-                // Điều chỉnh hệ số nét theo thiết bị (Bảo vệ tràn RAM đối với đt yếu, nhưng vẫn đảm bảo 2K/HD)
-                const isMobile = window.innerWidth <= 768;
-                const captureScale = isMobile ? 3.5 : 5; 
-
-                const canvas = await html2canvas(card, {
-                    scale: captureScale, 
-                    useCORS: true,
-                    backgroundColor: null, 
-                    logging: false,
-                    scrollX: 0,
-                    scrollY: 0,
-                    windowWidth: document.documentElement.offsetWidth,
-                    windowHeight: document.documentElement.offsetHeight
-                });
-                return canvas;
-            } catch (error) {
-                console.error("Lỗi khi tạo ảnh:", error);
-                alert("Đã xảy ra lỗi khi tạo ảnh. Vui lòng thử lại.");
-                return null;
-            } finally {
-                // Phục hồi lại trạng thái ban đầu của trang
-                card.style.transform = oldTransform;
-                wrapper.style.height = oldWrapperHeight;
-                window.scrollTo(0, currentScrollY);
-                scrollContainer.scrollLeft = currentScrollX;
-                hideLoading();
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                e.preventDefault();
+                nextAction();
+            } else if (e.key === 'ArrowLeft') {
+                prevAction();
+            } else if (e.key === '1') {
+                // Phím tắt phóng to ảnh 1
+                if (btnToggleImg1.style.display !== 'none') btnToggleImg1.click();
+            } else if (e.key === '2') {
+                // Phím tắt phóng to ảnh 2
+                if (btnToggleImg2.style.display !== 'none') btnToggleImg2.click();
             }
-        }
+        });
 
-        async function saveImage() {
-            const canvas = await getCanvas();
-            if(!canvas) return;
+        btnFullscreen.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => console.log(`Error: ${err.message}`));
+            } else {
+                if (document.exitFullscreen) document.exitFullscreen();
+            }
+        });
 
-            const link = document.createElement('a');
-            link.download = 'Thong-Bao-Lich-Lam-Viec-Binh-Minh-HD.png';
-            link.href = canvas.toDataURL('image/png');
-            link.click();
-        }
+        document.addEventListener('fullscreenchange', () => {
+            if (document.fullscreenElement) {
+                iconFullscreen.classList.remove('fa-expand');
+                iconFullscreen.classList.add('fa-compress');
+            } else {
+                iconFullscreen.classList.remove('fa-compress');
+                iconFullscreen.classList.add('fa-expand');
+            }
+        });
 
-        async function shareImage() {
-            const canvas = await getCanvas();
-            if(!canvas) return;
+        // Xử lý nút Tải Ảnh Slide
+        btnDownload.addEventListener('click', () => {
+            const controls = document.querySelector('.controls');
+            const floatingBtns = document.querySelectorAll('.fullscreen-btn, .download-btn, .notes-btn, .toggle-image-btn');
+            const themeSel = document.querySelector('.theme-selector');
+            const slideWrapper = document.querySelector('.slide-wrapper');
+            
+            controls.style.display = 'none';
+            themeSel.style.display = 'none';
+            floatingBtns.forEach(btn => btn.style.display = 'none');
 
-            canvas.toBlob(async (blob) => {
-                const file = new File([blob], "Lich-Lam-Viec.png", { type: "image/png" });
-                
-                // Kiểm tra xem trình duyệt có hỗ trợ chia sẻ File ảnh không
-                if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                    try {
-                        await navigator.share({
-                            files: [file],
-                            title: 'Lịch Làm Việc - PK Bình Minh',
-                            text: 'Gửi bạn lịch làm việc cập nhật mới nhất của BS. Lê Đàm Vân.'
-                        });
-                    } catch (error) {
-                        console.log('Chia sẻ bị huỷ hoặc lỗi:', error);
+            html2canvas(slideWrapper, {
+                scale: 4, 
+                useCORS: true,
+                logging: false,
+                allowTaint: true,
+                backgroundColor: window.getComputedStyle(slideWrapper).backgroundColor
+            }).then(canvas => {
+                controls.style.display = 'flex';
+                themeSel.style.display = 'inline-flex';
+                floatingBtns.forEach(btn => {
+                    // Trả lại trạng thái display riêng biệt của nút zoom (nếu ở slide ko có ảnh thì không được hiện)
+                    if (btn.classList.contains('toggle-image-btn-1') && slideWrapper.querySelector('.split-layout') && slideWrapper.querySelectorAll('.image-caption-container').length > 0) {
+                        btn.style.display = 'flex';
+                    } else if (btn.classList.contains('toggle-image-btn-2') && slideWrapper.querySelectorAll('.image-caption-container').length > 1) {
+                        btn.style.display = 'flex';
+                    } else if (!btn.classList.contains('toggle-image-btn')) {
+                        btn.style.display = 'flex';
                     }
-                } else {
-                    alert('Trình duyệt hoặc thiết bị của bạn không hỗ trợ tính năng chia sẻ ảnh trực tiếp. Vui lòng sử dụng tính năng Lưu Ảnh HD 2K.');
-                }
-            }, 'image/png');
-        }
+                });
 
-        // Chạy ngay khi tải trang
-        document.addEventListener('DOMContentLoaded', initApp);
+                const link = document.createElement('a');
+                link.download = `BaiGiang_SoiCTC_Slide_${currentSlide + 1}.png`;
+                link.href = canvas.toDataURL('image/png', 1.0); 
+                link.click();
+            }).catch(err => {
+                console.error("Lỗi khi chụp ảnh slide: ", err);
+                controls.style.display = 'flex';
+                themeSel.style.display = 'inline-flex';
+                alert("Rất tiếc, không thể tải ảnh slide lúc này.");
+            });
+        });
 
+        updateSlide();
     </script>
 </body>
 </html>
