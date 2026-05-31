@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Lịch Làm Việc - PK Bình Minh</title>
+    <title>Tạo Lịch Làm Việc - PK Bình Minh</title>
     
     <!-- Cấu hình Web App / PWA (Thêm vào màn hình chính) -->
     <meta name="mobile-web-app-capable" content="yes">
@@ -174,20 +174,22 @@
 
                                     <div class="relative z-30 flex flex-col min-h-full">
                                         <!-- Header Thông Báo (Ngang) -->
-                                        <div class="mb-4 pt-3 flex flex-row items-center gap-4 w-full px-1">
+                                        <div class="mb-3 pt-2 flex flex-row items-center gap-3 w-full px-1">
                                             <div id="preview-icon" class="shrink-0">
                                                 <!-- Logo bên trái -->
-                                                <img id="clinic-logo" src="https://i.ibb.co/RTVKhSqC/1938fb385874.jpg" alt="Logo Phòng Khám" crossorigin="anonymous" class="w-[100px] h-[100px] rounded-[22px] bg-white p-1.5 object-contain border-2 shadow-[0_4px_15px_-3px_rgba(0,0,0,0.1)]">
+                                                <img id="clinic-logo" src="https://i.ibb.co/RTVKhSqC/1938fb385874.jpg" alt="Logo Phòng Khám" crossorigin="anonymous" class="w-[95px] h-[95px] rounded-[22px] bg-white p-1.5 object-contain border-2 shadow-[0_4px_15px_-3px_rgba(0,0,0,0.1)]">
                                             </div>
-                                            <div class="flex-1 flex flex-col justify-center text-left">
+                                            <div class="flex-1 flex flex-col justify-center text-center">
                                                 <h2 class="text-[11px] font-bold tracking-[0.1em] uppercase mb-0.5 opacity-90 leading-tight" id="preview-clinic-name">Phòng Khám Sản Phụ Khoa</h2>
-                                                <h3 class="text-[26px] font-black uppercase tracking-widest drop-shadow-sm mb-2 leading-none" id="preview-clinic-brand">BÌNH MINH</h3>
+                                                <h3 class="text-[28px] font-black uppercase tracking-widest drop-shadow-sm mb-1.5 leading-none" id="preview-clinic-brand">BÌNH MINH</h3>
                                                 
-                                                <h1 class="text-[28px] font-black uppercase tracking-widest mb-1 leading-none drop-shadow-md">Thông Báo</h1>
-                                                <p class="text-[13px] font-bold uppercase tracking-wider mb-0.5 leading-tight">Lịch Làm Việc Trong Tuần</p>
-                                                <p id="preview-date-range" class="text-[12px] font-medium opacity-90 italic"></p>
+                                                <h1 class="text-[20px] font-black uppercase tracking-widest mb-1 leading-none drop-shadow-md">Thông Báo</h1>
+                                                <p class="text-[13px] font-bold uppercase tracking-wider leading-tight">Lịch Làm Việc Trong Tuần</p>
                                             </div>
                                         </div>
+
+                                        <!-- Thời gian áp dụng full chiều ngang -->
+                                        <div id="preview-date-range" class="text-[16px] font-black w-full text-center flex justify-center items-center mb-3 drop-shadow-sm tracking-wide"></div>
 
                                         <!-- Lịch Render -->
                                         <div class="backdrop-blur-md rounded-xl p-3 shadow-sm border flex-1" id="preview-schedule-box">
@@ -490,7 +492,7 @@
 
             // Cập nhật logo
             if(logo) {
-                logo.className = `w-[100px] h-[100px] rounded-[22px] bg-white p-1.5 object-contain shadow-[0_4px_15px_-3px_rgba(0,0,0,0.1)] border-2 transition-colors duration-300 ${theme.boxBorder}`;
+                logo.className = `w-[95px] h-[95px] rounded-[22px] bg-white p-1.5 object-contain shadow-[0_4px_15px_-3px_rgba(0,0,0,0.1)] border-2 transition-colors duration-300 ${theme.boxBorder}`;
             }
             
             // Cập nhật Hoa Văn (Pattern)
@@ -508,7 +510,7 @@
             if (id === 8 || id === 10 || id === 14) {
                 scheduleBox.className += ' bg-black/20 border-opacity-30';
                 card.style.border = '1px solid rgba(255,255,255,0.1)';
-                dateRange.className = 'text-[12px] font-medium opacity-90 italic text-white/80';
+                dateRange.className = 'text-[16px] font-black w-full text-center flex justify-center items-center mb-3 tracking-wide text-white drop-shadow-md';
                 
                 // Doctor Box Dark Mode
                 doctorBox.className = 'mb-2 bg-black/40 rounded-xl py-2 px-2 shadow-sm flex flex-col items-center border border-white/10 backdrop-blur-md';
@@ -516,7 +518,7 @@
             } else {
                 scheduleBox.className += ' bg-white/60';
                 card.style.border = 'none';
-                dateRange.className = `text-[12px] font-medium opacity-90 italic ${theme.text}`;
+                dateRange.className = `text-[16px] font-black w-full text-center flex justify-center items-center mb-3 tracking-wide drop-shadow-md ${theme.text}`;
                 
                 // Doctor Box Light Mode
                 doctorBox.className = 'mb-2 bg-white/40 rounded-xl py-2 px-2 shadow-sm flex flex-col items-center border border-white/40 backdrop-blur-md';
@@ -597,14 +599,16 @@
             const to = document.getElementById('date-to').value;
             const previewText = document.getElementById('preview-date-range');
             
+            const calendarIcon = `<i class="fa-solid fa-calendar-day text-[18px] opacity-80 mr-2"></i>`;
+            
             if (from && to) {
-                previewText.innerText = `(Áp dụng từ ${formatDate(from)} đến ${formatDate(to)})`;
+                previewText.innerHTML = `${calendarIcon} ${formatDate(from)} - ${formatDate(to)}`;
             } else if (from) {
-                previewText.innerText = `(Áp dụng từ ${formatDate(from)})`;
+                previewText.innerHTML = `${calendarIcon} Từ ${formatDate(from)}`;
             } else if (to) {
-                previewText.innerText = `(Áp dụng đến ${formatDate(to)})`;
+                previewText.innerHTML = `${calendarIcon} Đến ${formatDate(to)}`;
             } else {
-                previewText.innerText = "";
+                previewText.innerHTML = "";
             }
         }
 
